@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useBoards } from '../hooks/useBoards'
 import { Pagination } from '../components/Pagination'
 import { SearchBar } from '../components/SearchBar'
+import { PageSizeSelect } from '../components/PageSizeSelect'
 import { formatDateTime } from '../lib/format'
 
 // 첨부 이미지가 있는 글의 제목 옆에 붙이는 작은 아이콘
@@ -28,7 +29,7 @@ function ImageIcon() {
 }
 
 export function BoardListPage() {
-  const { data, loading, error, page, setPage, search, submitSearch } =
+  const { data, loading, error, page, setPage, size, changeSize, search, submitSearch } =
     useBoards()
   const navigate = useNavigate()
 
@@ -50,11 +51,14 @@ export function BoardListPage() {
 
       {data && !loading && (
         <>
-          {isSearching && (
+          <div className="list-toolbar">
             <p className="search-result-info muted">
-              ‘{search.keyword.trim()}’ 검색 결과 {data.totalElements}건
+              {isSearching
+                ? `‘${search.keyword.trim()}’ 검색 결과 ${data.totalElements}건`
+                : `전체 ${data.totalElements}건`}
             </p>
-          )}
+            <PageSizeSelect value={size} onChange={changeSize} />
+          </div>
           {data.content.length === 0 ? (
             <p className="muted">
               {isSearching
