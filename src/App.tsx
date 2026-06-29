@@ -4,6 +4,7 @@ import { BoardDetailPage } from './pages/BoardDetailPage'
 import { BoardWritePage } from './pages/BoardWritePage'
 import { BoardEditPage } from './pages/BoardEditPage'
 import { UserListPage } from './pages/UserListPage'
+import { UserDetailPage } from './pages/UserDetailPage'
 import { UserWritePage } from './pages/UserWritePage'
 import { UserEditPage } from './pages/UserEditPage'
 import { LoginPage } from './pages/LoginPage'
@@ -80,6 +81,7 @@ function App() {
               </RequireAuth>
             }
           />
+          <Route path="/users/:id" element={<UserDetailPage />} />
           <Route
             path="/users/:id/edit"
             element={

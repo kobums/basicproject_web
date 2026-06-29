@@ -2,8 +2,9 @@ import { useCallback, useEffect, useState } from 'react'
 import { fetchUsers } from '../api/users'
 import type { PageResponse, User } from '../types/user'
 
-export function useUsers(initialPage = 0) {
+export function useUsers(initialPage = 0, initialSize = 10) {
   const [page, setPage] = useState(initialPage)
+  const [size, setSize] = useState(initialSize)
   // keyword: 입력값(즉시 반영), debouncedKeyword: 실제 조회에 쓰이는 값
   const [keyword, setKeyword] = useState('')
   const [debouncedKeyword, setDebouncedKeyword] = useState('')
@@ -25,7 +26,7 @@ export function useUsers(initialPage = 0) {
     setLoading(true)
     setError(null)
     try {
-      setData(await fetchUsers(page, debouncedKeyword))
+      setData(await fetchUsers(page, debouncedKeyword, size))
     } catch (e) {
       setError(
         e instanceof Error ? e.message : '회원 목록을 불러오지 못했습니다.',
@@ -33,11 +34,17 @@ export function useUsers(initialPage = 0) {
     } finally {
       setLoading(false)
     }
-  }, [page, debouncedKeyword])
+  }, [page, debouncedKeyword, size])
 
   useEffect(() => {
     void load()
   }, [load])
+
+  // 페이지 크기 변경: 첫 페이지부터 다시 조회.
+  const changeSize = useCallback((next: number) => {
+    setSize(next)
+    setPage(0)
+  }, [])
 
   return {
     data,
@@ -45,6 +52,8 @@ export function useUsers(initialPage = 0) {
     error,
     page,
     setPage,
+    size,
+    changeSize,
     keyword,
     setKeyword,
     reload: load,
