@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import type { SyntheticEvent } from 'react'
 import type { BoardSearch, SearchType } from '../types/board'
 
 interface SearchBarProps {
@@ -20,7 +21,7 @@ export function SearchBar({ value, onSearch }: Readonly<SearchBarProps>) {
   const [type, setType] = useState<SearchType>(value.type)
   const [keyword, setKeyword] = useState(value.keyword)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
     onSearch({ type, keyword: keyword.trim() })
   }
@@ -35,38 +36,40 @@ export function SearchBar({ value, onSearch }: Readonly<SearchBarProps>) {
   const hasActiveSearch = value.keyword.trim().length > 0
 
   return (
-    <form className="search-bar" onSubmit={handleSubmit} role="search">
-      <select
-        className="search-type"
-        value={type}
-        onChange={(e) => setType(e.target.value as SearchType)}
-        aria-label="검색 조건"
-      >
-        {TYPE_OPTIONS.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+    <search>
+      <form className="search-bar" onSubmit={handleSubmit}>
+        <select
+          className="search-type"
+          value={type}
+          onChange={(e) => setType(e.target.value as SearchType)}
+          aria-label="검색 조건"
+        >
+          {TYPE_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
 
-      <input
-        className="search-input"
-        type="search"
-        value={keyword}
-        onChange={(e) => setKeyword(e.target.value)}
-        placeholder="검색어를 입력하세요"
-        aria-label="검색어"
-      />
+        <input
+          className="search-input"
+          type="search"
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+          placeholder="검색어를 입력하세요"
+          aria-label="검색어"
+        />
 
-      <button type="submit" className="btn btn-primary">
-        검색
-      </button>
-
-      {hasActiveSearch && (
-        <button type="button" className="btn" onClick={handleReset}>
-          초기화
+        <button type="submit" className="btn btn-primary">
+          검색
         </button>
-      )}
-    </form>
+
+        {hasActiveSearch && (
+          <button type="button" className="btn" onClick={handleReset}>
+            초기화
+          </button>
+        )}
+      </form>
+    </search>
   )
 }

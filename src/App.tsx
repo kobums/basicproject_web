@@ -9,6 +9,7 @@ import { UserWritePage } from './pages/UserWritePage'
 import { UserEditPage } from './pages/UserEditPage'
 import { LoginPage } from './pages/LoginPage'
 import { SignupPage } from './pages/SignupPage'
+import { ComponentsPage } from './pages/ComponentsPage'
 import { RequireAuth } from './components/RequireAuth'
 import { useAuth } from './context/auth'
 
@@ -30,6 +31,7 @@ function App() {
             게시판
           </NavLink>
           <NavLink to="/users">회원</NavLink>
+          <NavLink to="/components">컴포넌트</NavLink>
         </div>
         <div className="topnav-auth">
           {isAuthenticated ? (
@@ -90,6 +92,7 @@ function App() {
               </RequireAuth>
             }
           />
+          <Route path="/components" element={<ComponentsPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route

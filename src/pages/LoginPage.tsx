@@ -3,6 +3,7 @@ import type { SyntheticEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { login } from '../api/auth'
 import { HttpError } from '../api/client'
+import { Input } from '../components/Input'
 import { useAuth } from '../context/auth'
 import { useFeedback } from '../context/feedback'
 
@@ -46,29 +47,23 @@ export function LoginPage() {
     <section className="page">
       <h1>로그인</h1>
       <form className="board-form" onSubmit={handleSubmit}>
-        <label className="field">
-          <span>이메일</span>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            maxLength={255}
-            placeholder="user@example.com"
-            required
-          />
-        </label>
+        <Input
+          label="이메일"
+          type="email"
+          value={email}
+          onChange={setEmail}
+          placeholder="user@example.com"
+          required
+        />
 
-        <label className="field">
-          <span>비밀번호</span>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            maxLength={255}
-            placeholder="비밀번호"
-            required
-          />
-        </label>
+        <Input
+          label="비밀번호"
+          type="password"
+          value={password}
+          onChange={setPassword}
+          placeholder="비밀번호"
+          required
+        />
 
         <div className="board-form-actions">
           <Link className="btn" to="/signup">

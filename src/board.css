@@ -90,7 +90,7 @@
 }
 
 .error {
-  color: #e5484d;
+  color: var(--danger);
 }
 
 /* ---- 버튼 ---- */
@@ -132,12 +132,12 @@
 }
 
 .btn-danger {
-  color: #e5484d;
-  border-color: rgba(229, 72, 77, 0.4);
+  color: var(--danger);
+  border-color: var(--danger-border);
 }
 
 .btn-danger:hover:not(:disabled) {
-  background: rgba(229, 72, 77, 0.08);
+  background: var(--danger-bg);
 }
 
 /* ---- 검색바 ---- */
@@ -470,7 +470,7 @@
 .field-error {
   font-style: normal;
   font-size: 13px;
-  color: #e5484d;
+  color: var(--danger);
 }
 
 .board-form-actions {
@@ -631,11 +631,11 @@
 }
 
 .toast-success {
-  border-left-color: #30a46c;
+  border-left-color: var(--success);
 }
 
 .toast-error {
-  border-left-color: #e5484d;
+  border-left-color: var(--danger);
 }
 
 .toast-icon {
@@ -653,11 +653,11 @@
 }
 
 .toast-success .toast-icon {
-  background: #30a46c;
+  background: var(--success);
 }
 
 .toast-error .toast-icon {
-  background: #e5484d;
+  background: var(--danger);
 }
 
 .toast-body {
@@ -675,7 +675,7 @@
   margin: 0;
   font-size: 14px;
   line-height: 1.4;
-  word-break: break-word;
+  word-break: break-all;
 }
 
 .toast-close {

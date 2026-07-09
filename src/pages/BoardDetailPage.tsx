@@ -3,7 +3,8 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useBoard } from '../hooks/useBoard'
 import { deleteBoard } from '../api/boards'
 import { formatDateTime } from '../lib/format'
-import { Modal } from '../components/Modal'
+import { ConfirmModal } from '../components/ConfirmModal'
+import { ImageLightbox } from '../components/ImageLightbox'
 import { useFeedback } from '../context/feedback'
 
 export function BoardDetailPage() {
@@ -45,7 +46,7 @@ export function BoardDetailPage() {
       </div>
 
       {board.imgUrl && (
-        <img
+        <ImageLightbox
           className="board-image"
           src={board.imgUrl}
           alt={board.title ?? '게시글 이미지'}
@@ -71,33 +72,17 @@ export function BoardDetailPage() {
         </button>
       </div>
 
-      <Modal
+      <ConfirmModal
         open={confirmOpen}
-        onClose={() => !deleting && setConfirmOpen(false)}
         title="게시글 삭제"
-        footer={
-          <>
-            <button
-              type="button"
-              className="btn"
-              onClick={() => setConfirmOpen(false)}
-              disabled={deleting}
-            >
-              취소
-            </button>
-            <button
-              type="button"
-              className="btn btn-danger"
-              onClick={handleDelete}
-              disabled={deleting}
-            >
-              {deleting ? '삭제 중…' : '삭제'}
-            </button>
-          </>
-        }
+        danger
+        busy={deleting}
+        confirmLabel="삭제"
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={handleDelete}
       >
         이 게시글을 정말 삭제하시겠습니까?
-      </Modal>
+      </ConfirmModal>
     </section>
   )
 }

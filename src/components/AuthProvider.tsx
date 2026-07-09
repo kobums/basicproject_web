@@ -1,13 +1,9 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { AuthContext } from '../context/auth'
 import type { User } from '../types/user'
 import { fetchMe } from '../api/auth'
-import {
-  getToken,
-  setToken,
-  UNAUTHORIZED_EVENT,
-} from '../lib/authStorage'
+import { getToken, setToken, UNAUTHORIZED_EVENT } from '../lib/authStorage'
 
 interface AuthProviderProps {
   children: ReactNode
@@ -15,6 +11,8 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children }: Readonly<AuthProviderProps>) {
   const [user, setUser] = useState<User | null>(null)
+  // 저장된 토큰이 있으면 복구가 끝날 때까지 restoring 상태 유지
+  const [restoring, setRestoring] = useState(() => Boolean(getToken()))
 
   const setSession = useCallback((token: string, nextUser: User) => {
     setToken(token)
@@ -35,6 +33,7 @@ export function AuthProvider({ children }: Readonly<AuthProviderProps>) {
         // 토큰이 만료/무효면 client.ts 가 이미 토큰을 비우고 이벤트를 쏜다.
         setUser(null)
       })
+      .finally(() => setRestoring(false))
   }, [])
 
   // 401 발생 시(다른 요청 중 토큰 만료) 로그아웃 상태로 동기화한다.
@@ -44,11 +43,16 @@ export function AuthProvider({ children }: Readonly<AuthProviderProps>) {
     return () => window.removeEventListener(UNAUTHORIZED_EVENT, onUnauthorized)
   }, [])
 
-  return (
-    <AuthContext.Provider
-      value={{ user, isAuthenticated: user !== null, setSession, logout }}
-    >
-      {children}
-    </AuthContext.Provider>
+  const value = useMemo(
+    () => ({
+      user,
+      isAuthenticated: user !== null,
+      restoring,
+      setSession,
+      logout,
+    }),
+    [user, restoring, setSession, logout],
   )
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
