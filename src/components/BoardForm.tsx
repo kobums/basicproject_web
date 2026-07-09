@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { ChangeEvent, SyntheticEvent } from 'react'
+import { Input } from './Input'
 
 export interface BoardFormValues {
   title: string
@@ -46,33 +47,23 @@ export function BoardForm({
 
   return (
     <form className="board-form" onSubmit={handleSubmit}>
-      <label className="field">
-        <span>제목</span>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          maxLength={255}
-          placeholder="제목을 입력하세요"
-        />
-        {fieldErrors.title && (
-          <em className="field-error">{fieldErrors.title}</em>
-        )}
-      </label>
+      <Input
+        label="제목"
+        value={title}
+        onChange={setTitle}
+        placeholder="제목을 입력하세요"
+        error={fieldErrors.title}
+      />
 
-      <label className="field">
-        <span>내용</span>
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          rows={8}
-          maxLength={255}
-          placeholder="내용을 입력하세요 (최대 255자)"
-        />
-        {fieldErrors.content && (
-          <em className="field-error">{fieldErrors.content}</em>
-        )}
-      </label>
+      <Input
+        label="내용"
+        value={content}
+        onChange={setContent}
+        multiline
+        rows={8}
+        placeholder="내용을 입력하세요 (최대 255자)"
+        error={fieldErrors.content}
+      />
 
       <div className="field">
         <span>이미지{mode === 'create' ? ' (선택)' : ' (변경 시에만 선택)'}</span>

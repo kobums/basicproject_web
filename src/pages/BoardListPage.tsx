@@ -2,8 +2,12 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useBoards } from '../hooks/useBoards'
 import { Pagination } from '../components/Pagination'
 import { SearchBar } from '../components/SearchBar'
-import { PageSizeSelect } from '../components/PageSizeSelect'
+import { PageHeader } from '../components/PageHeader'
+import { ListToolbar } from '../components/ListToolbar'
+import { DataTable } from '../components/DataTable'
+import type { DataTableColumn } from '../components/DataTable'
 import { formatDateTime } from '../lib/format'
+import type { Board } from '../types/board'
 
 // 첨부 이미지가 있는 글의 제목 옆에 붙이는 작은 아이콘
 function ImageIcon() {
@@ -28,6 +32,34 @@ function ImageIcon() {
   )
 }
 
+const COLUMNS: DataTableColumn<Board>[] = [
+  { key: 'id', header: '번호', width: '64px', align: 'center' },
+  {
+    key: 'title',
+    header: '제목',
+    render: (board) => (
+      <>
+        <span className="title-text">{board.title ?? '(제목 없음)'}</span>
+        {board.imgUrl && <ImageIcon />}
+      </>
+    ),
+  },
+  {
+    key: 'author',
+    header: '작성자',
+    width: '110px',
+    render: (board) => board.author.name ?? `#${board.author.id}`,
+  },
+  {
+    key: 'createdAt',
+    header: '작성일',
+    width: '140px',
+    render: (board) => (
+      <span className="muted">{formatDateTime(board.createdAt)}</span>
+    ),
+  },
+]
+
 export function BoardListPage() {
   const { data, loading, error, page, setPage, size, changeSize, search, submitSearch } =
     useBoards()
@@ -37,12 +69,11 @@ export function BoardListPage() {
 
   return (
     <section className="page">
-      <header className="page-header">
-        <h1>게시판</h1>
+      <PageHeader title="게시판">
         <Link className="btn btn-primary" to="/boards/new">
           글쓰기
         </Link>
-      </header>
+      </PageHeader>
 
       <SearchBar value={search} onSearch={submitSearch} />
 
@@ -51,55 +82,25 @@ export function BoardListPage() {
 
       {data && !loading && (
         <>
-          <div className="list-toolbar">
-            <p className="search-result-info muted">
-              {isSearching
+          <ListToolbar
+            info={
+              isSearching
                 ? `‘${search.keyword.trim()}’ 검색 결과 ${data.totalElements}건`
-                : `전체 ${data.totalElements}건`}
-            </p>
-            <PageSizeSelect value={size} onChange={changeSize} />
-          </div>
-          {data.content.length === 0 ? (
-            <p className="muted">
-              {isSearching
-                ? '검색 결과가 없습니다.'
-                : '등록된 글이 없습니다.'}
-            </p>
-          ) : (
-            <table className="board-table">
-              <thead>
-                <tr>
-                  <th className="col-id">번호</th>
-                  <th className="col-title">제목</th>
-                  <th className="col-author">작성자</th>
-                  <th className="col-date">작성일</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.content.map((board) => (
-                  <tr
-                    key={board.id}
-                    className="row-clickable"
-                    onClick={() => navigate(`/boards/${board.id}`)}
-                  >
-                    <td className="col-id">{board.id}</td>
-                    <td className="col-title">
-                      <span className="title-text">
-                        {board.title ?? '(제목 없음)'}
-                      </span>
-                      {board.imgUrl && <ImageIcon />}
-                    </td>
-                    <td className="col-author">
-                      {board.author.name ?? `#${board.author.id}`}
-                    </td>
-                    <td className="col-date">
-                      {formatDateTime(board.createdAt)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+                : `전체 ${data.totalElements}건`
+            }
+            size={size}
+            onSizeChange={changeSize}
+          />
+
+          <DataTable
+            columns={COLUMNS}
+            data={data.content}
+            rowKey={(board) => board.id}
+            onRowClick={(board) => navigate(`/boards/${board.id}`)}
+            emptyText={
+              isSearching ? '검색 결과가 없습니다.' : '등록된 글이 없습니다.'
+            }
+          />
 
           <Pagination
             page={page}

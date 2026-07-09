@@ -1,6 +1,6 @@
 # basicproject_web
 
-React + TypeScript + Vite 기반의 게시판/회원 관리 프론트엔드. JWT 인증, 게시판 CRUD(이미지 업로드 포함), 회원 관리 기능을 제공하며 Spring Boot 백엔드(`:8080`)와 연동된다.
+React + TypeScript + Vite 기반의 게시판/회원 관리 프론트엔드. JWT 인증, 게시판 CRUD(이미지 업로드 포함), 회원 관리 기능을 제공하며 Spring Boot 백엔드(`:8081`)와 연동된다.
 
 ## 기술 스택
 
@@ -23,7 +23,7 @@ React + TypeScript + Vite 기반의 게시판/회원 관리 프론트엔드. JWT
 ### 사전 요구사항
 
 - Node.js 18+ (권장 20+)
-- 백엔드 서버가 `http://localhost:8080`에서 실행 중 (API/이미지 제공)
+- 백엔드 서버가 `http://localhost:8081`에서 실행 중 (API/이미지 제공)
 
 ### 설치 및 실행
 
@@ -32,7 +32,7 @@ npm install
 npm run dev
 ```
 
-개발 서버는 기본적으로 `http://localhost:5173`에서 뜬다. `/api`, `/uploads` 요청은 Vite 프록시를 통해 백엔드(`:8080`)로 전달된다(같은 출처로 묶여 CORS preflight 회피).
+개발 서버는 기본적으로 `http://localhost:5173`에서 뜬다. `/api`, `/uploads` 요청은 Vite 프록시를 통해 백엔드(`:8081`)로 전달된다(같은 출처로 묶여 CORS preflight 회피).
 
 ### 환경 변수
 

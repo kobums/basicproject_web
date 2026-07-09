@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { fetchUsers } from '../api/users'
 import type { PageResponse, User } from '../types/user'
 
@@ -22,17 +22,23 @@ export function useUsers(initialPage = 0, initialSize = 10) {
     return () => clearTimeout(timer)
   }, [keyword])
 
+  // 요청 순번. 이전 요청의 늦은 응답이 최신 결과를 덮어쓰지 않도록 가드.
+  const requestSeq = useRef(0)
+
   const load = useCallback(async () => {
+    const seq = ++requestSeq.current
     setLoading(true)
     setError(null)
     try {
-      setData(await fetchUsers(page, debouncedKeyword, size))
+      const res = await fetchUsers(page, debouncedKeyword, size)
+      if (seq === requestSeq.current) setData(res)
     } catch (e) {
-      setError(
-        e instanceof Error ? e.message : '회원 목록을 불러오지 못했습니다.',
-      )
+      if (seq === requestSeq.current)
+        setError(
+          e instanceof Error ? e.message : '회원 목록을 불러오지 못했습니다.',
+        )
     } finally {
-      setLoading(false)
+      if (seq === requestSeq.current) setLoading(false)
     }
   }, [page, debouncedKeyword, size])
 

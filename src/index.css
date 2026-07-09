@@ -1,13 +1,58 @@
+/* ==== 색상 토큰 — 토스(TDS) 팔레트 기반 ====
+   기본(primary) 색상은 Toss Blue(#3182F6).
+   컴포넌트에서는 원색 토큰 대신 아래 시맨틱 변수(--accent, --danger 등)를 쓴다. */
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
+  /* Blue (Primary — Toss Blue) */
+  --blue-50: #e8f3ff;
+  --blue-100: #c9e2ff;
+  --blue-200: #90c2ff;
+  --blue-300: #64a8ff;
+  --blue-400: #4593fc;
+  --blue-500: #3182f6;
+  --blue-600: #2272eb;
+  --blue-700: #1b64da;
+
+  /* Grey */
+  --grey-50: #f9fafb;
+  --grey-100: #f2f4f6;
+  --grey-200: #e5e8eb;
+  --grey-300: #d1d6db;
+  --grey-400: #b0b8c1;
+  --grey-500: #8b95a1;
+  --grey-600: #6b7684;
+  --grey-700: #4e5968;
+  --grey-800: #333d4b;
+  --grey-900: #191f28;
+
+  /* 상태 색상 */
+  --red-400: #f66570;
+  --red-500: #f04452;
+  --green-400: #15c47e;
+  --green-500: #03b26c;
+  --green-600: #02a262;
+  --orange-500: #fe9800;
+  --purple-400: #a78bfa;
+  --purple-500: #8b5cf6;
+
+  /* ---- 시맨틱 변수 (라이트) ---- */
+  --text: var(--grey-600);
+  --text-h: var(--grey-900);
   --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
+  --border: var(--grey-200);
+  --code-bg: var(--grey-100);
+
+  --accent: var(--blue-500);
+  --accent-bg: rgba(49, 130, 246, 0.08);
+  --accent-border: rgba(49, 130, 246, 0.45);
+
+  --danger: var(--red-500);
+  --danger-bg: rgba(240, 68, 82, 0.08);
+  --danger-border: rgba(240, 68, 82, 0.4);
+  --success: var(--green-500);
+  --warning: var(--orange-500);
+  --purple: var(--purple-500);
+
+  --social-bg: rgba(242, 244, 246, 0.5);
   --shadow:
     rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
 
@@ -32,15 +77,25 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
+    /* ---- 시맨틱 변수 (다크) — 액센트/상태 색은 한 단계 밝은 톤 ---- */
+    --text: var(--grey-400);
+    --text-h: var(--grey-100);
+    --bg: #17171c;
+    --border: var(--grey-800);
+    --code-bg: #23232b;
+
+    --accent: var(--blue-400);
+    --accent-bg: rgba(69, 147, 252, 0.14);
+    --accent-border: rgba(69, 147, 252, 0.5);
+
+    --danger: var(--red-400);
+    --danger-bg: rgba(246, 101, 112, 0.12);
+    --danger-border: rgba(246, 101, 112, 0.45);
+    --success: var(--green-400);
+    --warning: var(--orange-500);
+    --purple: var(--purple-400);
+
+    --social-bg: rgba(51, 61, 75, 0.5);
     --shadow:
       rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
   }
