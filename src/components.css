@@ -2213,7 +2213,8 @@
   right: 4px;
   bottom: 2px;
   font-size: 11px;
-  color: var(--grey-400);
+  color: var(--text);
+  opacity: 0.7;
   pointer-events: none;
   user-select: none;
 }
@@ -2247,7 +2248,7 @@
 
 .org-edge {
   fill: none;
-  stroke: var(--grey-300);
+  stroke: var(--border);
   stroke-width: 1.6;
   transition: opacity 0.4s ease, stroke 0.3s ease;
 }
@@ -2257,44 +2258,46 @@
 }
 
 .org-edge.on {
-  stroke: var(--blue-300);
+  stroke: var(--accent-border);
   stroke-width: 2;
 }
 
 .org-root {
-  fill: var(--grey-900);
+  fill: var(--text-h);
   transition: fill 0.2s ease, stroke 0.2s ease;
 }
 
 .org-box {
-  fill: #fff;
-  stroke: var(--grey-200);
+  fill: var(--bg);
+  stroke: var(--border);
   stroke-width: 1.5;
   transition: fill 0.2s ease, stroke 0.2s ease;
 }
 
 .org-node:hover .org-box {
-  stroke: var(--blue-500);
+  stroke: var(--accent);
 }
 
 .org-node:hover .org-root {
-  fill: var(--grey-800);
+  stroke: var(--accent);
+  stroke-width: 1.5;
 }
 
 .org-node.sel .org-box {
-  fill: var(--blue-50);
-  stroke: var(--blue-500);
+  fill: var(--accent-bg);
+  stroke: var(--accent);
   stroke-width: 2.4;
 }
 
 .org-node.sel .org-root {
-  fill: var(--blue-500);
-  stroke: var(--blue-700);
+  fill: var(--accent);
+  stroke: var(--accent-border);
   stroke-width: 2.4;
 }
 
+/* 루트 노드 글자는 배경색 — 라이트(진회색 박스/흰 글자), 다크(밝은 박스/어두운 글자) 모두 대비 유지 */
 .org-root-tx {
-  fill: #fff;
+  fill: var(--bg);
   font-size: 14px;
   font-weight: 700;
   letter-spacing: -0.01em;
@@ -2302,42 +2305,42 @@
 }
 
 .org-box-tx {
-  fill: var(--grey-900);
+  fill: var(--text-h);
   font-size: 13px;
   font-weight: 600;
   pointer-events: none;
 }
 
 .org-node.sel .org-box-tx {
-  fill: var(--blue-600);
+  fill: var(--accent);
 }
 
 .org-cnt-tx {
-  fill: var(--grey-500);
+  fill: var(--text);
   font-size: 11px;
   pointer-events: none;
 }
 
 .org-node.sel .org-cnt-tx {
-  fill: var(--blue-400);
+  fill: var(--accent);
 }
 
 /* 접힘 배지 — 숨어 있는 직계 하위 수 (+N) */
 .org-more rect {
-  fill: #fff;
-  stroke: var(--blue-100);
+  fill: var(--bg);
+  stroke: var(--accent-border);
   stroke-width: 1.4;
 }
 
 .org-more text {
-  fill: var(--blue-500);
+  fill: var(--accent);
   font-size: 10.5px;
   font-weight: 700;
   pointer-events: none;
 }
 
 .org-node:hover .org-more rect {
-  stroke: var(--blue-500);
+  stroke: var(--accent);
 }
 
 .org-node:focus-visible {
@@ -2346,6 +2349,6 @@
 
 .org-node:focus-visible .org-box,
 .org-node:focus-visible .org-root {
-  stroke: var(--blue-500);
+  stroke: var(--accent);
   stroke-width: 2.4;
 }

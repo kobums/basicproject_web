@@ -292,6 +292,7 @@ export function OrgChart({ items, selectedKey = null, onSelect }: Readonly<OrgCh
       const [x, y, w, h] = vbRef.current
       if (![x, y, w, h].every(Number.isFinite)) return
       const rect = el.getBoundingClientRect()
+      if (rect.width <= 0 || rect.height <= 0) return // 0-크기 rect → NaN 좌표 오염 방지
       const s = Math.min(rect.width / w, rect.height / h) // preserveAspectRatio 'meet' 스케일
       const offX = (rect.width - w * s) / 2
       const offY = (rect.height - h * s) / 2
