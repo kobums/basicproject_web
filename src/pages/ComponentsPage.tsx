@@ -55,6 +55,8 @@ import { InfiniteScroll } from '../components/InfiniteScroll'
 import { BackToTop } from '../components/BackToTop'
 import { ListManager } from '../components/ListManager'
 import type { ListManagerItem } from '../components/ListManager'
+import { OrgChart } from '../components/OrgChart'
+import type { OrgChartItem } from '../components/OrgChart'
 import heroImg from '../assets/hero.png'
 import { useLoading } from '../context/loading'
 import { useFeedback } from '../context/feedback'
@@ -99,6 +101,23 @@ const STATUS_VARIANT: Record<string, BadgeVariant> = {
   대기: 'blue',
   정지: 'red',
 }
+
+// ---- OrgChart 데모용 샘플 조직 (parentId 자기참조 평면 목록) ----
+const ORG_ITEMS: OrgChartItem[] = [
+  { id: 1, name: '베이직컴퍼니' },
+  { id: 10, parentId: 1, name: '경영지원본부', count: 3 },
+  { id: 11, parentId: 10, name: '인사팀', count: 6 },
+  { id: 12, parentId: 10, name: '재무팀', count: 5 },
+  { id: 13, parentId: 10, name: '총무팀', count: 4 },
+  { id: 20, parentId: 1, name: '개발본부', count: 2 },
+  { id: 21, parentId: 20, name: '플랫폼팀', count: 4 },
+  { id: 22, parentId: 21, name: '백엔드파트', count: 8 },
+  { id: 23, parentId: 21, name: '프론트엔드파트', count: 7 },
+  { id: 24, parentId: 20, name: '인프라팀', count: 5 },
+  { id: 30, parentId: 1, name: '영업본부', count: 2 },
+  { id: 31, parentId: 30, name: '국내영업팀', count: 9 },
+  { id: 32, parentId: 30, name: '해외영업팀', count: 6 },
+]
 
 // 다음 피드 배치 10개를 생성 (순수 함수 — 중첩 함수 깊이를 낮추려 컴포넌트 밖으로 분리)
 const nextFeedBatch = (fromLength: number): number[] =>
@@ -159,6 +178,9 @@ export function ComponentsPage() {
     key: 'id',
     dir: 'asc',
   })
+
+  // OrgChart 데모 상태
+  const [orgKey, setOrgKey] = useState<string | null>(null)
 
   // 4차 신규 컴포넌트 데모 상태
   const [todos, setTodos] = useState<ListManagerItem[]>([
@@ -532,7 +554,7 @@ export function ComponentsPage() {
             },
             {
               title: '백엔드 포트는?',
-              content: '8081 입니다. 8080 은 다른 프로젝트가 사용 중입니다.',
+              content: '8007 입니다. 8080 은 다른 프로젝트가 사용 중입니다.',
             },
             {
               title: '상태 관리는?',
@@ -829,7 +851,7 @@ export function ComponentsPage() {
           <DescriptionList
             items={[
               { label: '프로젝트', value: 'basicproject' },
-              { label: '백엔드', value: 'Spring Boot (:8081)' },
+              { label: '백엔드', value: 'Spring Boot (:8007)' },
               {
                 label: '상태',
                 value: <StatusBadge label="진행중" variant="blue" />,
@@ -894,6 +916,11 @@ export function ComponentsPage() {
             { label: 'package.json' },
           ]}
         />
+      </div>
+
+      <div className="demo-section">
+        <h2>OrgChart</h2>
+        <OrgChart items={ORG_ITEMS} selectedKey={orgKey} onSelect={setOrgKey} />
       </div>
 
       <div className="demo-section">
