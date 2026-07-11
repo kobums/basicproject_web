@@ -5,10 +5,10 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    // dev에서 /api, /uploads 요청을 Spring Boot(8081)로 프록시 → same-origin, CORS preflight 회피
+    // dev에서 /api, /uploads 요청을 Spring Boot(8007)로 프록시 → same-origin, CORS preflight 회피
     proxy: {
-      '/api': 'http://localhost:8081',
-      '/uploads': 'http://localhost:8081',
+      '/api': 'http://localhost:8007',
+      '/uploads': 'http://localhost:8007',
     },
   },
 })

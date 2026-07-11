@@ -2191,3 +2191,164 @@
   font-size: 12px;
   color: var(--text);
 }
+
+/* ---- OrgChart (조직 구성도 — 점진적 펼침 SVG 트리) ---- */
+.org-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.org-tools {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+  display: flex;
+  gap: 6px;
+}
+
+.org-hint {
+  position: absolute;
+  right: 4px;
+  bottom: 2px;
+  font-size: 11px;
+  color: var(--text);
+  opacity: 0.7;
+  pointer-events: none;
+  user-select: none;
+}
+
+.org-svg {
+  width: 100%;
+  flex: 1;
+  min-height: 360px;
+  display: block;
+  cursor: grab;
+  touch-action: none;
+}
+
+.org-svg:active {
+  cursor: grabbing;
+}
+
+.org-node {
+  cursor: pointer;
+  transition: opacity 0.4s ease;
+}
+
+/* 포커스 시 흐려진 노드도 클릭해 바로 선택 전환 가능 — hover 시 또렷하게 */
+.org-node.dim {
+  opacity: 0.14;
+}
+
+.org-node.dim:hover {
+  opacity: 1;
+}
+
+.org-edge {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 1.6;
+  transition: opacity 0.4s ease, stroke 0.3s ease;
+}
+
+.org-edge.dim {
+  opacity: 0.06;
+}
+
+.org-edge.on {
+  stroke: var(--accent-border);
+  stroke-width: 2;
+}
+
+.org-root {
+  fill: var(--text-h);
+  transition: fill 0.2s ease, stroke 0.2s ease;
+}
+
+.org-box {
+  fill: var(--bg);
+  stroke: var(--border);
+  stroke-width: 1.5;
+  transition: fill 0.2s ease, stroke 0.2s ease;
+}
+
+.org-node:hover .org-box {
+  stroke: var(--accent);
+}
+
+.org-node:hover .org-root {
+  stroke: var(--accent);
+  stroke-width: 1.5;
+}
+
+.org-node.sel .org-box {
+  fill: var(--accent-bg);
+  stroke: var(--accent);
+  stroke-width: 2.4;
+}
+
+.org-node.sel .org-root {
+  fill: var(--accent);
+  stroke: var(--accent-border);
+  stroke-width: 2.4;
+}
+
+/* 루트 노드 글자는 배경색 — 라이트(진회색 박스/흰 글자), 다크(밝은 박스/어두운 글자) 모두 대비 유지 */
+.org-root-tx {
+  fill: var(--bg);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  pointer-events: none;
+}
+
+.org-box-tx {
+  fill: var(--text-h);
+  font-size: 13px;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.org-node.sel .org-box-tx {
+  fill: var(--accent);
+}
+
+.org-cnt-tx {
+  fill: var(--text);
+  font-size: 11px;
+  pointer-events: none;
+}
+
+.org-node.sel .org-cnt-tx {
+  fill: var(--accent);
+}
+
+/* 접힘 배지 — 숨어 있는 직계 하위 수 (+N) */
+.org-more rect {
+  fill: var(--bg);
+  stroke: var(--accent-border);
+  stroke-width: 1.4;
+}
+
+.org-more text {
+  fill: var(--accent);
+  font-size: 10.5px;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.org-node:hover .org-more rect {
+  stroke: var(--accent);
+}
+
+.org-node:focus-visible {
+  outline: none;
+}
+
+.org-node:focus-visible .org-box,
+.org-node:focus-visible .org-root {
+  stroke: var(--accent);
+  stroke-width: 2.4;
+}
