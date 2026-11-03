@@ -13,7 +13,10 @@ interface MenuDropdownProps {
 }
 
 // ⋯ 버튼을 누르면 나오는 액션 메뉴 (테이블 행의 수정/삭제 등).
-export function MenuDropdown({ items, label = '⋯' }: Readonly<MenuDropdownProps>) {
+export function MenuDropdown({
+  items,
+  label = '⋯',
+}: Readonly<MenuDropdownProps>) {
   const [open, setOpen] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
 

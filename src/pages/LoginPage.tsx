@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { SyntheticEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { login } from '../api/auth'
-import { HttpError } from '../api/client'
+import { errorMessage } from '../api/errors'
 import { Input } from '../components/Input'
 import { useAuth } from '../context/auth'
 import { useFeedback } from '../context/feedback'
@@ -34,10 +34,7 @@ export function LoginPage() {
     } catch (err) {
       notify({
         type: 'error',
-        message:
-          err instanceof HttpError
-            ? err.message
-            : '로그인에 실패했습니다.',
+        message: errorMessage(err, '로그인에 실패했습니다.'),
       })
       setSubmitting(false)
     }

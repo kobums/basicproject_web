@@ -13,8 +13,8 @@ dist-ssr
 build
 *.local
 
-# Env files — 시크릿이 들어갈 수 있는 local override 는 절대 커밋하지 않는다.
-# .env 는 공개 가능한 기본값만 담고 커밋한다(VITE_* 는 번들에 포함되므로 시크릿 금지).
+# Env files — .env 는 .env.example 을 복사해 만들고 커밋하지 않는다.
+.env
 .env.local
 .env.*.local
 .env.development.local

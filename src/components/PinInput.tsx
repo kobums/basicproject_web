@@ -9,7 +9,11 @@ interface PinInputProps {
 
 // 인증번호(OTP) 입력. 한 자리 치면 다음 칸으로, Backspace 는 이전 칸으로,
 // 붙여넣기는 전체를 한 번에 채운다.
-export function PinInput({ value, onChange, length = 6 }: Readonly<PinInputProps>) {
+export function PinInput({
+  value,
+  onChange,
+  length = 6,
+}: Readonly<PinInputProps>) {
   const refs = useRef<(HTMLInputElement | null)[]>([])
 
   const setDigit = (index: number, digit: string) => {
@@ -35,7 +39,10 @@ export function PinInput({ value, onChange, length = 6 }: Readonly<PinInputProps
 
   const handlePaste = (e: ClipboardEvent) => {
     e.preventDefault()
-    const digits = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, length)
+    const digits = e.clipboardData
+      .getData('text')
+      .replace(/\D/g, '')
+      .slice(0, length)
     onChange(digits)
     refs.current[Math.min(digits.length, length - 1)]?.focus()
   }

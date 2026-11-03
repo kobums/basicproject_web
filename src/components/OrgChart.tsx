@@ -37,7 +37,8 @@ const ANIM_MS = 520
 
 type VB = [number, number, number, number]
 
-const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
+const easeInOutCubic = (t: number) =>
+  t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
 
 interface GraphNode {
   key: string
@@ -60,10 +61,16 @@ function buildGraph(items: OrgChartItem[]): Graph {
   items.forEach((it) => {
     const key = String(it.id)
     const parentKey =
-      it.parentId != null && String(it.parentId) !== key ? String(it.parentId) : null
+      it.parentId != null && String(it.parentId) !== key
+        ? String(it.parentId)
+        : null
     byKey.set(key, {
-      key, name: it.name, isRoot: false,
-      parentKey, childKeys: [], count: it.count ?? 0,
+      key,
+      name: it.name,
+      isRoot: false,
+      parentKey,
+      childKeys: [],
+      count: it.count ?? 0,
     })
   })
 
@@ -90,7 +97,9 @@ function buildGraph(items: OrgChartItem[]): Graph {
     if (n.parentKey) byKey.get(n.parentKey)!.childKeys.push(n.key)
   })
   byKey.forEach((n) => {
-    n.childKeys.sort((a, b) => byKey.get(a)!.name.localeCompare(byKey.get(b)!.name, 'ko'))
+    n.childKeys.sort((a, b) =>
+      byKey.get(a)!.name.localeCompare(byKey.get(b)!.name, 'ko'),
+    )
   })
 
   const rootKeys = [...byKey.values()]
@@ -114,7 +123,10 @@ interface GNode extends GraphNode {
 }
 
 /** 펼쳐진(expanded) 노드의 하위만 그리는 tidy 레이아웃 */
-function layoutVisible(graph: Graph, expanded: Set<string>): { nodes: GNode[]; bounds: VB } {
+function layoutVisible(
+  graph: Graph,
+  expanded: Set<string>,
+): { nodes: GNode[]; bounds: VB } {
   const nodes: GNode[] = []
   let cursor = 0
   const place = (key: string, depth: number): GNode => {
@@ -122,7 +134,10 @@ function layoutVisible(graph: Graph, expanded: Set<string>): { nodes: GNode[]; b
     const open = g.childKeys.length > 0 && expanded.has(key)
     const node: GNode = {
       ...g,
-      x: 0, y: depth * (NODE_H + GAP_Y), w: NODE_W, h: g.isRoot ? ROOT_H : NODE_H,
+      x: 0,
+      y: depth * (NODE_H + GAP_Y),
+      w: NODE_W,
+      h: g.isRoot ? ROOT_H : NODE_H,
       hiddenKids: open ? 0 : g.childKeys.length,
     }
     if (!open) {
@@ -156,7 +171,11 @@ interface OrgChartProps {
   onSelect?: (key: string | null) => void
 }
 
-export function OrgChart({ items, selectedKey = null, onSelect }: Readonly<OrgChartProps>) {
+export function OrgChart({
+  items,
+  selectedKey = null,
+  onSelect,
+}: Readonly<OrgChartProps>) {
   const graph = useMemo(() => buildGraph(items), [items])
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
 
@@ -184,7 +203,10 @@ export function OrgChart({ items, selectedKey = null, onSelect }: Readonly<OrgCh
     })
   }, [selectedKey, graph])
 
-  const { nodes, bounds } = useMemo(() => layoutVisible(graph, expanded), [graph, expanded])
+  const { nodes, bounds } = useMemo(
+    () => layoutVisible(graph, expanded),
+    [graph, expanded],
+  )
   const nodeMap = useMemo(() => new Map(nodes.map((n) => [n.key, n])), [nodes])
 
   const [vb, setVb] = useState<VB>(bounds)
@@ -260,9 +282,12 @@ export function OrgChart({ items, selectedKey = null, onSelect }: Readonly<OrgCh
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, nodes, bounds])
 
-  useEffect(() => () => {
-    if (rafRef.current) cancelAnimationFrame(rafRef.current)
-  }, [])
+  useEffect(
+    () => () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+    },
+    [],
+  )
 
   /** 수동 확대/축소 — cx,cy(viewBox 좌표) 기준, 없으면 화면 중심. 자동 카메라 애니메이션은 중단 */
   const zoomBy = (factor: number, cx?: number, cy?: number) => {
@@ -345,7 +370,8 @@ export function OrgChart({ items, selectedKey = null, onSelect }: Readonly<OrgCh
   }
 
   const dimmed = (key: string) => (visible ? !visible.has(key) : false)
-  const label = (n: GNode) => (n.name.length > 10 ? `${n.name.slice(0, 10)}…` : n.name)
+  const label = (n: GNode) =>
+    n.name.length > 10 ? `${n.name.slice(0, 10)}…` : n.name
 
   /** 재클릭 접기: 자신 + 모든 하위의 펼침 상태를 제거 */
   const collapseSubtree = (key: string) => {
@@ -387,10 +413,20 @@ export function OrgChart({ items, selectedKey = null, onSelect }: Readonly<OrgCh
   return (
     <div className="org-wrap">
       <div className="org-tools">
-        <button type="button" className="btn btn-sm" onClick={() => zoomBy(1 / 1.4)} aria-label="확대">
+        <button
+          type="button"
+          className="btn btn-sm"
+          onClick={() => zoomBy(1 / 1.4)}
+          aria-label="확대"
+        >
           ＋
         </button>
-        <button type="button" className="btn btn-sm" onClick={() => zoomBy(1.4)} aria-label="축소">
+        <button
+          type="button"
+          className="btn btn-sm"
+          onClick={() => zoomBy(1.4)}
+          aria-label="축소"
+        >
           －
         </button>
         <button type="button" className="btn btn-sm" onClick={resetAll}>
@@ -409,7 +445,13 @@ export function OrgChart({ items, selectedKey = null, onSelect }: Readonly<OrgCh
       >
         <defs>
           <filter id="org-shadow" x="-20%" y="-20%" width="140%" height="150%">
-            <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#191f28" floodOpacity="0.10" />
+            <feDropShadow
+              dx="0"
+              dy="2"
+              stdDeviation="3"
+              floodColor="#191f28"
+              floodOpacity="0.10"
+            />
           </filter>
         </defs>
         {nodes.map((n) => {
@@ -449,7 +491,9 @@ export function OrgChart({ items, selectedKey = null, onSelect }: Readonly<OrgCh
             >
               <title>
                 {n.name}
-                {n.hiddenKids > 0 ? ` — 하위 ${n.hiddenKids}개 (클릭해 펼치기)` : ''}
+                {n.hiddenKids > 0
+                  ? ` — 하위 ${n.hiddenKids}개 (클릭해 펼치기)`
+                  : ''}
               </title>
               <rect
                 className={n.isRoot ? 'org-root' : 'org-box'}
@@ -479,7 +523,10 @@ export function OrgChart({ items, selectedKey = null, onSelect }: Readonly<OrgCh
                 </text>
               )}
               {n.hiddenKids > 0 && (
-                <g className="org-more" transform={`translate(${n.w / 2}, ${n.h})`}>
+                <g
+                  className="org-more"
+                  transform={`translate(${n.w / 2}, ${n.h})`}
+                >
                   <rect x={-17} y={-9} width={34} height={18} rx={9} />
                   <text textAnchor="middle" dominantBaseline="central">
                     +{n.hiddenKids}

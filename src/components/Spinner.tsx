@@ -6,6 +6,10 @@ interface SpinnerProps {
 export function Spinner({ size = 'md' }: Readonly<SpinnerProps>) {
   const sizeClass = size === 'md' ? '' : ` spinner-${size}`
   return (
-    <span className={`spinner${sizeClass}`} role="status" aria-label="로딩 중" />
+    <span
+      className={`spinner${sizeClass}`}
+      role="status"
+      aria-label="로딩 중"
+    />
   )
 }

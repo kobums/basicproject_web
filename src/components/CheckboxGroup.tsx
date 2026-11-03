@@ -24,9 +24,7 @@ export function CheckboxGroup({
   disabled = false,
 }: Readonly<CheckboxGroupProps>) {
   const toggle = (value: string, checked: boolean) => {
-    onChange(
-      checked ? [...values, value] : values.filter((v) => v !== value),
-    )
+    onChange(checked ? [...values, value] : values.filter((v) => v !== value))
   }
 
   return (

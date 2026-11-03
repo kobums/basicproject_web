@@ -1,12 +1,16 @@
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useUsers } from '../hooks/useUsers'
+import { useUser } from '../gen/hooks/useUser'
+import type { User, UserSearchParams } from '../gen/types/user'
+import { errorMessage } from '../api/errors'
 import { Pagination } from '../components/Pagination'
 import { PageHeader } from '../components/PageHeader'
 import { ListToolbar } from '../components/ListToolbar'
 import { DataTable } from '../components/DataTable'
 import type { DataTableColumn } from '../components/DataTable'
-import { formatDateTime } from '../lib/format'
-import type { User } from '../types/user'
+import { formatDateTime, pageCount } from '../lib/format'
+import { useAuth } from '../context/auth'
+import { isAdmin } from '../lib/permissions'
 
 const COLUMNS: DataTableColumn<User>[] = [
   { key: 'id', header: '번호', width: '64px', align: 'center' },
@@ -15,62 +19,101 @@ const COLUMNS: DataTableColumn<User>[] = [
     key: 'name',
     header: '이름',
     width: '110px',
-    render: (user) => user.name ?? '-',
+    render: (user) => user.name || '-',
   },
   {
-    key: 'createdAt',
+    key: 'createddate',
     header: '가입일',
     width: '140px',
     render: (user) => (
-      <span className="muted">{formatDateTime(user.createdAt)}</span>
+      <span className="muted">{formatDateTime(user.createddate)}</span>
     ),
   },
 ]
 
+// 검색어 → 목록 필터. gomachine 문자열 필터는 부분 일치라 '@' 가 있으면 이메일, 아니면 이름에 검색어가 들어간 회원을 찾는다.
+function toFilter(keyword: string): UserSearchParams {
+  if (!keyword) return {}
+  return keyword.includes('@') ? { email: keyword } : { name: keyword }
+}
+
 export function UserListPage() {
-  const {
-    data,
-    loading,
-    error,
-    page,
-    setPage,
-    size,
-    changeSize,
-    keyword,
-    setKeyword,
-  } = useUsers()
+  // 회원 읽기는 본인 행만 (관리자는 모든 회원). 관리자가 아니면 목록에 자기 자신만 온다.
+  const { user: me } = useAuth()
+  const admin = isAdmin(me)
+  const { items, total, loading, error, fetchPage } = useUser()
+  const [page, setPage] = useState(1)
+  const [size, setSize] = useState(10)
+  // keyword: 입력값(즉시 반영), applied: 실제 조회에 쓰이는 값
+  const [keyword, setKeyword] = useState('')
+  const [applied, setApplied] = useState('')
+  const [loaded, setLoaded] = useState(false)
   const navigate = useNavigate()
-  const isSearching = keyword.trim().length > 0
+
+  // 입력이 멈춘 뒤 300ms 후에만 조회어를 갱신(타이핑마다 요청 폭주 방지).
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setApplied(keyword.trim())
+      setPage(1)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [keyword])
+
+  useEffect(() => {
+    void fetchPage({
+      page,
+      pagesize: size,
+      orderby: 'id desc',
+      ...toFilter(applied),
+    }).then(() => setLoaded(true))
+  }, [fetchPage, page, size, applied])
+
+  const changeSize = (next: number) => {
+    setSize(next)
+    setPage(1)
+  }
+
+  const isSearching = applied.length > 0
 
   return (
     <section className="page">
-      <PageHeader title="회원">
-        <Link className="btn btn-primary" to="/users/new">
-          회원 추가
-        </Link>
+      <PageHeader title={admin ? '회원' : '내 정보'}>
+        {admin && (
+          <Link className="btn btn-primary" to="/users/new">
+            회원 추가
+          </Link>
+        )}
       </PageHeader>
 
-      <search className="search-bar">
-        <input
-          className="search-input"
-          type="search"
-          value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
-          placeholder="이름 또는 이메일로 검색"
-          aria-label="회원 검색"
-        />
-      </search>
+      {admin ? (
+        <search className="search-bar">
+          <input
+            className="search-input"
+            type="search"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            placeholder="이름 또는 이메일 (일부만 입력해도 찾는다)"
+            aria-label="회원 검색"
+          />
+        </search>
+      ) : (
+        <p className="muted">관리자가 아니면 본인 정보만 볼 수 있습니다.</p>
+      )}
 
-      {loading && !data && <p className="muted">불러오는 중…</p>}
-      {error && <p className="error">{error}</p>}
+      {loading && !loaded && <p className="muted">불러오는 중…</p>}
+      {error != null && (
+        <p className="error">
+          {errorMessage(error, '회원 목록을 불러오지 못했습니다.')}
+        </p>
+      )}
 
-      {data && (
+      {loaded && error == null && (
         <>
           <ListToolbar
             info={
               isSearching
-                ? `‘${keyword.trim()}’ 검색 결과 ${data.totalElements}명`
-                : `전체 ${data.totalElements}명`
+                ? `‘${applied}’ 검색 결과 ${total}명`
+                : `전체 ${total}명`
             }
             size={size}
             onSizeChange={changeSize}
@@ -78,7 +121,7 @@ export function UserListPage() {
 
           <DataTable
             columns={COLUMNS}
-            data={data.content}
+            data={items}
             rowKey={(user) => user.id}
             onRowClick={(user) => navigate(`/users/${user.id}`)}
             emptyText={
@@ -88,7 +131,7 @@ export function UserListPage() {
 
           <Pagination
             page={page}
-            totalPages={data.totalPages}
+            totalPages={pageCount(total, size)}
             onChange={setPage}
           />
         </>

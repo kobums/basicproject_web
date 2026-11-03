@@ -6,7 +6,10 @@ interface CopyButtonProps {
 }
 
 // 클릭하면 text 를 클립보드에 복사하고 잠시 "복사됨 ✓" 을 보여준다.
-export function CopyButton({ text, label = '복사' }: Readonly<CopyButtonProps>) {
+export function CopyButton({
+  text,
+  label = '복사',
+}: Readonly<CopyButtonProps>) {
   const [copied, setCopied] = useState(false)
   const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 

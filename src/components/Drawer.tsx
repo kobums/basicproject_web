@@ -10,7 +10,12 @@ interface DrawerProps {
 }
 
 // 오른쪽에서 슬라이드되어 나오는 사이드 패널. ESC/배경 클릭으로 닫힌다.
-export function Drawer({ open, onClose, title, children }: Readonly<DrawerProps>) {
+export function Drawer({
+  open,
+  onClose,
+  title,
+  children,
+}: Readonly<DrawerProps>) {
   // ESC 닫기 + 열려 있는 동안 배경 스크롤 잠금 (Modal 과 동일한 패턴)
   useEffect(() => {
     if (!open) return

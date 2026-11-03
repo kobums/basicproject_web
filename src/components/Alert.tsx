@@ -47,7 +47,13 @@ function AlertIcon({ variant }: Readonly<{ variant: AlertVariant }>) {
   // 원 안에 i / ✓ / ! 를 그리는 공용 아이콘
   const mark = { info: 'i', success: '✓', warning: '!', error: '!' }[variant]
   return (
-    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      width="18"
+      height="18"
+      fill="none"
+      aria-hidden="true"
+    >
       <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
       <text
         x="12"

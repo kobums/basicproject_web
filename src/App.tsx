@@ -12,6 +12,7 @@ import { SignupPage } from './pages/SignupPage'
 import { ComponentsPage } from './pages/ComponentsPage'
 import { RequireAuth } from './components/RequireAuth'
 import { useAuth } from './context/auth'
+import { isAdmin } from './lib/permissions'
 
 function App() {
   const { user, isAuthenticated, logout } = useAuth()
@@ -30,13 +31,13 @@ function App() {
           <NavLink to="/" end>
             게시판
           </NavLink>
-          <NavLink to="/users">회원</NavLink>
+          <NavLink to="/users">{isAdmin(user) ? '회원' : '내 정보'}</NavLink>
           <NavLink to="/components">컴포넌트</NavLink>
         </div>
         <div className="topnav-auth">
           {isAuthenticated ? (
             <>
-              <span className="topnav-user">{user?.name ?? user?.email}</span>
+              <span className="topnav-user">{user?.name || user?.email}</span>
               <button
                 type="button"
                 className="btn btn-sm"
@@ -55,8 +56,16 @@ function App() {
       </nav>
 
       <main className="container">
+        {/* auth=jwt: 게시판은 read "login", 회원은 본인(관리자는 전체)만 읽으므로 게시판 / 회원 화면은 모두 RequireAuth 로 감싼다. */}
         <Routes>
-          <Route path="/" element={<BoardListPage />} />
+          <Route
+            path="/"
+            element={
+              <RequireAuth>
+                <BoardListPage />
+              </RequireAuth>
+            }
+          />
           <Route
             path="/boards/new"
             element={
@@ -65,7 +74,14 @@ function App() {
               </RequireAuth>
             }
           />
-          <Route path="/boards/:id" element={<BoardDetailPage />} />
+          <Route
+            path="/boards/:id"
+            element={
+              <RequireAuth>
+                <BoardDetailPage />
+              </RequireAuth>
+            }
+          />
           <Route
             path="/boards/:id/edit"
             element={
@@ -74,7 +90,14 @@ function App() {
               </RequireAuth>
             }
           />
-          <Route path="/users" element={<UserListPage />} />
+          <Route
+            path="/users"
+            element={
+              <RequireAuth>
+                <UserListPage />
+              </RequireAuth>
+            }
+          />
           <Route
             path="/users/new"
             element={
@@ -83,7 +106,14 @@ function App() {
               </RequireAuth>
             }
           />
-          <Route path="/users/:id" element={<UserDetailPage />} />
+          <Route
+            path="/users/:id"
+            element={
+              <RequireAuth>
+                <UserDetailPage />
+              </RequireAuth>
+            }
+          />
           <Route
             path="/users/:id/edit"
             element={

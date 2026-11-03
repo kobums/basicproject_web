@@ -18,7 +18,8 @@ function toISO(y: number, m: number, d: number): string {
 // 월 그리드 달력. 이전/다음 달 이동, 오늘 강조, 날짜 선택.
 // (Datepicker 가 네이티브 input 이라면, 이건 그리드를 직접 그리는 학습용 구현)
 export function Calendar({ value, onChange }: Readonly<CalendarProps>) {
-  const today = new Date()
+  // 오늘 날짜는 처음 그릴 때 한 번만 정한다 (렌더마다 new Date() 를 부르지 않는다)
+  const [today] = useState(() => new Date())
   const selected = value ? new Date(`${value}T00:00:00`) : null
 
   // 보고 있는 달 (선택값이 있으면 그 달부터, 없으면 이번 달)
@@ -39,7 +40,11 @@ export function Calendar({ value, onChange }: Readonly<CalendarProps>) {
   const first = new Date(viewYear, viewMonth, 1)
   const start = new Date(viewYear, viewMonth, 1 - first.getDay())
   const cells = Array.from({ length: 42 }, (_, i) => {
-    const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i)
+    const d = new Date(
+      start.getFullYear(),
+      start.getMonth(),
+      start.getDate() + i,
+    )
     return d
   })
 
@@ -94,7 +99,9 @@ export function Calendar({ value, onChange }: Readonly<CalendarProps>) {
               key={d.toISOString()}
               type="button"
               className={cls}
-              onClick={() => onChange(toISO(d.getFullYear(), d.getMonth(), d.getDate()))}
+              onClick={() =>
+                onChange(toISO(d.getFullYear(), d.getMonth(), d.getDate()))
+              }
             >
               {d.getDate()}
             </button>

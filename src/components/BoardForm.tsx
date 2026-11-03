@@ -61,12 +61,14 @@ export function BoardForm({
         onChange={setContent}
         multiline
         rows={8}
-        placeholder="내용을 입력하세요 (최대 255자)"
+        placeholder="내용을 입력하세요"
         error={fieldErrors.content}
       />
 
       <div className="field">
-        <span>이미지{mode === 'create' ? ' (선택)' : ' (변경 시에만 선택)'}</span>
+        <span>
+          이미지{mode === 'create' ? ' (선택)' : ' (변경 시에만 선택)'}
+        </span>
         {mode === 'edit' && currentImgUrl && (
           <img className="img-preview" src={currentImgUrl} alt="현재 이미지" />
         )}

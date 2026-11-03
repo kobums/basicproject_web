@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { AuthContext } from '../context/auth'
-import type { User } from '../types/user'
+import type { User } from '../gen/types/user'
 import { fetchMe } from '../api/auth'
 import { getToken, setToken, UNAUTHORIZED_EVENT } from '../lib/authStorage'
 
@@ -30,7 +30,8 @@ export function AuthProvider({ children }: Readonly<AuthProviderProps>) {
     fetchMe()
       .then(setUser)
       .catch(() => {
-        // 토큰이 만료/무효면 client.ts 가 이미 토큰을 비우고 이벤트를 쏜다.
+        // HTTP 401 이면 api/setup.ts 의 핸들러가 이미 토큰을 비우고 이벤트를 쏜다.
+        // 그 밖의 실패(네트워크 등)는 토큰을 두고 비로그인으로만 본다 (새로고침하면 다시 시도).
         setUser(null)
       })
       .finally(() => setRestoring(false))
