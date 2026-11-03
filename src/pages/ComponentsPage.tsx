@@ -60,8 +60,8 @@ import type { OrgChartItem } from '../components/OrgChart'
 import heroImg from '../assets/hero.png'
 import { useLoading } from '../context/loading'
 import { useFeedback } from '../context/feedback'
-import { fetchUsers } from '../api/users'
-import type { User } from '../types/user'
+import UserModel from '../gen/models/user'
+import type { User } from '../gen/types/user'
 
 // ---- DataTable 데모용 샘플 데이터 ----
 interface DemoRow {
@@ -218,7 +218,14 @@ export function ComponentsPage() {
   })
 
   const fetchPickerUsers = useCallback(
-    (page: number, keyword: string) => fetchUsers(page, keyword, 5),
+    // 이름이 같은 회원 (gomachine 문자열 필터는 같음(=) 비교, '@' 가 있으면 이메일로 찾는다)
+    (page: number, keyword: string) =>
+      UserModel.findpage({
+        page,
+        pagesize: 5,
+        orderby: 'id desc',
+        ...(keyword.includes('@') ? { email: keyword } : { name: keyword }),
+      }),
     [],
   )
 
@@ -461,7 +468,7 @@ export function ComponentsPage() {
           </button>
           {pickedUser && (
             <span className="demo-value">
-              선택된 회원: <code>{pickedUser.name ?? pickedUser.email}</code>
+              선택된 회원: <code>{pickedUser.name || pickedUser.email}</code>
             </span>
           )}
         </div>
@@ -474,9 +481,9 @@ export function ComponentsPage() {
           rowKey={(u) => u.id}
           onSelect={(u) => {
             setPickedUser(u)
-            notify({ type: 'success', message: `${u.name ?? u.email} 선택됨` })
+            notify({ type: 'success', message: `${u.name || u.email} 선택됨` })
           }}
-          placeholder="이름 또는 이메일로 검색"
+          placeholder="이름 또는 이메일 (정확히 일치)"
         />
       </div>
 

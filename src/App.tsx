@@ -36,7 +36,7 @@ function App() {
         <div className="topnav-auth">
           {isAuthenticated ? (
             <>
-              <span className="topnav-user">{user?.name ?? user?.email}</span>
+              <span className="topnav-user">{user?.name || user?.email}</span>
               <button
                 type="button"
                 className="btn btn-sm"
@@ -55,8 +55,16 @@ function App() {
       </nav>
 
       <main className="container">
+        {/* auth=jwt 로 생성한 API 는 읽기도 로그인이 필요하므로 게시판 / 회원 화면은 모두 RequireAuth 로 감싼다. */}
         <Routes>
-          <Route path="/" element={<BoardListPage />} />
+          <Route
+            path="/"
+            element={
+              <RequireAuth>
+                <BoardListPage />
+              </RequireAuth>
+            }
+          />
           <Route
             path="/boards/new"
             element={
@@ -65,7 +73,14 @@ function App() {
               </RequireAuth>
             }
           />
-          <Route path="/boards/:id" element={<BoardDetailPage />} />
+          <Route
+            path="/boards/:id"
+            element={
+              <RequireAuth>
+                <BoardDetailPage />
+              </RequireAuth>
+            }
+          />
           <Route
             path="/boards/:id/edit"
             element={
@@ -74,7 +89,14 @@ function App() {
               </RequireAuth>
             }
           />
-          <Route path="/users" element={<UserListPage />} />
+          <Route
+            path="/users"
+            element={
+              <RequireAuth>
+                <UserListPage />
+              </RequireAuth>
+            }
+          />
           <Route
             path="/users/new"
             element={
@@ -83,7 +105,14 @@ function App() {
               </RequireAuth>
             }
           />
-          <Route path="/users/:id" element={<UserDetailPage />} />
+          <Route
+            path="/users/:id"
+            element={
+              <RequireAuth>
+                <UserDetailPage />
+              </RequireAuth>
+            }
+          />
           <Route
             path="/users/:id/edit"
             element={

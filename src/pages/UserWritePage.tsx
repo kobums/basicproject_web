@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { UserForm } from '../components/UserForm'
 import type { UserFormValues } from '../components/UserForm'
-import { createUser } from '../api/users'
-import { HttpError } from '../api/client'
+import UserModel from '../gen/models/user'
+import { errorMessage, fieldErrorsOf } from '../api/errors'
 import { useFeedback } from '../context/feedback'
 
 export function UserWritePage() {
@@ -16,23 +16,24 @@ export function UserWritePage() {
     setSubmitting(true)
     setFieldErrors({})
     try {
-      await createUser(values)
+      // 생성 API 의 비밀번호 필드는 passwd (서버가 해시해서 저장한다). level 은 보호 컬럼이라 보내지 않는다.
+      await UserModel.insert({
+        email: values.email,
+        name: values.name,
+        passwd: values.password,
+      })
       notify({ type: 'success', message: '회원이 등록되었습니다.' })
       navigate('/users')
     } catch (e) {
-      if (e instanceof HttpError && e.status === 400) {
-        setFieldErrors(e.fieldErrors)
-        const hasField = Object.keys(e.fieldErrors).length > 0
-        notify({
-          type: 'error',
-          message: hasField ? '입력값을 확인해주세요.' : e.message,
-        })
-      } else {
-        notify({
-          type: 'error',
-          message: e instanceof Error ? e.message : '가입에 실패했습니다.',
-        })
-      }
+      const fields = fieldErrorsOf(e)
+      setFieldErrors(fields)
+      notify({
+        type: 'error',
+        message:
+          Object.keys(fields).length > 0
+            ? '입력값을 확인해주세요.'
+            : errorMessage(e, '등록에 실패했습니다.'),
+      })
       setSubmitting(false)
     }
   }
