@@ -8,7 +8,11 @@ interface ImageLightboxProps {
 }
 
 // 클릭하면 전체 화면으로 확대되는 이미지. ESC/클릭으로 닫는다.
-export function ImageLightbox({ src, alt, className }: Readonly<ImageLightboxProps>) {
+export function ImageLightbox({
+  src,
+  alt,
+  className,
+}: Readonly<ImageLightboxProps>) {
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
@@ -31,9 +35,18 @@ export function ImageLightbox({ src, alt, className }: Readonly<ImageLightboxPro
         type="button"
         onClick={() => setOpen(true)}
         aria-label={`${alt} 크게 보기`}
-        style={{ border: 'none', padding: 0, background: 'none', cursor: 'zoom-in' }}
+        style={{
+          border: 'none',
+          padding: 0,
+          background: 'none',
+          cursor: 'zoom-in',
+        }}
       >
-        <img className={`lightbox-thumb${className ? ` ${className}` : ''}`} src={src} alt={alt} />
+        <img
+          className={`lightbox-thumb${className ? ` ${className}` : ''}`}
+          src={src}
+          alt={alt}
+        />
       </button>
 
       {open &&

@@ -17,7 +17,9 @@ export const FeedbackContext = createContext<NotifyFn | null>(null)
 export function useFeedback(): NotifyFn {
   const notify = useContext(FeedbackContext)
   if (!notify) {
-    throw new Error('useFeedback 는 FeedbackProvider 안에서만 사용할 수 있습니다.')
+    throw new Error(
+      'useFeedback 는 FeedbackProvider 안에서만 사용할 수 있습니다.',
+    )
   }
   return notify
 }

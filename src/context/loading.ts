@@ -12,7 +12,9 @@ export const LoadingContext = createContext<LoadingControl | null>(null)
 export function useLoading(): LoadingControl {
   const ctx = useContext(LoadingContext)
   if (!ctx) {
-    throw new Error('useLoading 은 LoadingProvider 안에서만 사용할 수 있습니다.')
+    throw new Error(
+      'useLoading 은 LoadingProvider 안에서만 사용할 수 있습니다.',
+    )
   }
   return ctx
 }

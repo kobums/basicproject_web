@@ -2250,7 +2250,9 @@
   fill: none;
   stroke: var(--border);
   stroke-width: 1.6;
-  transition: opacity 0.4s ease, stroke 0.3s ease;
+  transition:
+    opacity 0.4s ease,
+    stroke 0.3s ease;
 }
 
 .org-edge.dim {
@@ -2264,14 +2266,18 @@
 
 .org-root {
   fill: var(--text-h);
-  transition: fill 0.2s ease, stroke 0.2s ease;
+  transition:
+    fill 0.2s ease,
+    stroke 0.2s ease;
 }
 
 .org-box {
   fill: var(--bg);
   stroke: var(--border);
   stroke-width: 1.5;
-  transition: fill 0.2s ease, stroke 0.2s ease;
+  transition:
+    fill 0.2s ease,
+    stroke 0.2s ease;
 }
 
 .org-node:hover .org-box {

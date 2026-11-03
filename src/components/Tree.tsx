@@ -58,7 +58,10 @@ function TreeItem({
         aria-expanded={hasChildren ? open : undefined}
         onClick={handleClick}
       >
-        <span className={`tree-toggle${hasChildren ? '' : ' leaf'}`} aria-hidden="true" />
+        <span
+          className={`tree-toggle${hasChildren ? '' : ' leaf'}`}
+          aria-hidden="true"
+        />
         {node.label}
       </button>
       {hasChildren && open && (

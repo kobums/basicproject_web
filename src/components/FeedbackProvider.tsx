@@ -21,7 +21,9 @@ const AUTO_DISMISS_MS: Record<FeedbackOptions['type'], number> = {
 // 앱 전역 토스트 알림 Provider.
 // 페이지에서는 useFeedback() 으로 notify({ type, message, onClose }) 호출.
 // onClose 는 토스트가 사라질 때(자동/수동) 한 번 실행된다(예: 목록으로 이동).
-export function FeedbackProvider({ children }: Readonly<FeedbackProviderProps>) {
+export function FeedbackProvider({
+  children,
+}: Readonly<FeedbackProviderProps>) {
   const [toasts, setToasts] = useState<ToastItem[]>([])
   const idRef = useRef(0)
 

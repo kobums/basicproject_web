@@ -7,7 +7,11 @@ interface AvatarGroupProps {
 }
 
 // 아바타를 겹쳐 쌓고, 넘치는 인원은 "+N" 으로 표시.
-export function AvatarGroup({ names, max = 4, size = 'md' }: Readonly<AvatarGroupProps>) {
+export function AvatarGroup({
+  names,
+  max = 4,
+  size = 'md',
+}: Readonly<AvatarGroupProps>) {
   const visible = names.slice(0, max)
   const rest = names.length - visible.length
 

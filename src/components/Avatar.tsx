@@ -5,7 +5,15 @@ interface AvatarProps {
 }
 
 // 이름 문자열에서 항상 같은 색이 나오도록 해시 → 팔레트 매핑 (토스 팔레트 계열)
-const PALETTE = ['#3182f6', '#1b64da', '#03b26c', '#02a262', '#fe9800', '#f04452', '#6b7684']
+const PALETTE = [
+  '#3182f6',
+  '#1b64da',
+  '#03b26c',
+  '#02a262',
+  '#fe9800',
+  '#f04452',
+  '#6b7684',
+]
 
 function colorOf(name: string): string {
   let hash = 0
