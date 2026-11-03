@@ -44,7 +44,6 @@ export default class BoardModel {
     toDone(res.data)
   }
 
-
   static async find(params?: BoardSearchParams): Promise<Board[]> {
     const res = await get<unknown>('/board', { params })
     return toList<Board>(res.data)
@@ -77,7 +76,6 @@ export default class BoardModel {
     const res = await get<unknown>('/board/count', { params })
     return toCount(res.data)
   }
-
 
   // 없으면 null (Go {item: null}, Spring 404 는 api 래퍼가 던진다).
   static async get(id: Id): Promise<Board | null> {

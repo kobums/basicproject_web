@@ -7,12 +7,15 @@ import { formatDateTime, imageUrl } from '../lib/format'
 import { ConfirmModal } from '../components/ConfirmModal'
 import { ImageLightbox } from '../components/ImageLightbox'
 import { useFeedback } from '../context/feedback'
+import { useAuth } from '../context/auth'
+import { isBoardOwner } from '../lib/permissions'
 
 export function BoardDetailPage() {
   const { id } = useParams<{ id: string }>()
   const boardId = Number(id)
   const navigate = useNavigate()
   const notify = useFeedback()
+  const { user } = useAuth()
   // 읽기는 생성 훅, 삭제처럼 결과를 바로 알아야 하는 쓰기는 생성 모델(던지는 쪽)을 쓴다.
   const { item: board, loading, error, fetchOne } = useBoard()
   const [loadedId, setLoadedId] = useState<number | null>(null)
@@ -57,6 +60,8 @@ export function BoardDetailPage() {
   if (!board) return <p className="muted page">게시글이 없습니다.</p>
 
   const img = imageUrl(board.img)
+  // 로그인 사용자는 모든 글을 읽고(read: login), 수정 / 삭제는 작성자만 한다 (서버도 막는다).
+  const owner = isBoardOwner(user, board)
 
   return (
     <section className="page board-detail">
@@ -80,17 +85,21 @@ export function BoardDetailPage() {
         <Link className="btn" to="/">
           목록
         </Link>
-        <Link className="btn" to={`/boards/${board.id}/edit`}>
-          수정
-        </Link>
-        <button
-          type="button"
-          className="btn btn-danger"
-          onClick={() => setConfirmOpen(true)}
-          disabled={deleting}
-        >
-          삭제
-        </button>
+        {owner && (
+          <>
+            <Link className="btn" to={`/boards/${board.id}/edit`}>
+              수정
+            </Link>
+            <button
+              type="button"
+              className="btn btn-danger"
+              onClick={() => setConfirmOpen(true)}
+              disabled={deleting}
+            >
+              삭제
+            </button>
+          </>
+        )}
       </div>
 
       <ConfirmModal

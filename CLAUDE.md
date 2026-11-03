@@ -4,7 +4,7 @@
 
 ## 프로젝트
 
-gomachine 표준 React 프론트엔드 (React 19 + Vite 8 + TypeScript 6 strict). Go(8007) / Spring(8081) / Rust(8080) 백엔드가
+gomachine 표준 React 프론트엔드 (React 19 + Vite 8 + TypeScript 6 strict). Go(8007) / Spring(8081) / Rust(8008) 백엔드가
 같은 HTTP 계약을 따르므로 어느 쪽에도 붙는다. dev 프록시 대상은 `VITE_PROXY_TARGET`.
 
 ## 명령
@@ -19,10 +19,14 @@ gomachine 표준 React 프론트엔드 (React 19 + Vite 8 + TypeScript 6 strict)
 - `src/gen/services/api.ts` 는 사용자 파일이다 (`src/api/client.ts` 재수출). 지우거나 따로 구현하지 않는다.
 - HTTP 클라이언트는 `src/api/client.ts` 하나다. `fetch` 를 다른 곳에서 직접 부르지 않는다.
   토큰 / 401 처리는 `src/api/setup.ts` 에서만 등록한다.
-- 게시판 / 회원 데이터: 읽기는 생성 훅(`useBoard`, `useUser`), 실패를 바로 알아야 하는 쓰기는 생성 모델(`BoardModel.insert` 등, 던진다).
+- 게시판 / 회원 데이터: 읽기는 생성 훅(`useBoard`, `useUser`), 쓰기는 생성 모델(`BoardModel.insert` 등, 던진다)을 try/catch 로 부른다.
+  본문 타입은 `CreateBoardRequest` / `UpdateBoardRequest` (서버가 정하는 user / level / createddate 는 없다).
   에러 문구는 `errorMessage(e, fallback)`, 입력값 오류는 `fieldErrorsOf(e)` (`src/api/errors.ts`).
 - 생성 API 의 `page` 는 1 부터, 목록은 `Page<T> = { items, total }`. `Pagination` 도 1 부터.
 - 조인한 작성자는 `board.extra?.user`. 날짜는 `"yyyy-MM-dd HH:mm:ss"` 문자열 (`formatDateTime`).
-- 인증 API(`/api/auth/login|signup|me`)는 손으로 만든 `src/api/auth.ts` 가 여러 응답 모양을 받아들인다. 계약은 README "백엔드 인증 API 계약".
+- 인증 API(`/api/auth/login|signup|me`)는 손으로 만든 `src/api/auth.ts`. 계약(`{token, tokenType, expiresInMs, user}`, 에러 `{status, message, fieldErrors?}`)은 README "백엔드 인증 API 계약".
+- 권한 UI 는 `src/lib/permissions.ts` 하나로 판단한다: 게시글 수정 / 삭제는 작성자만(`isBoardOwner`), 관리자(`level >= ADMIN_LEVEL`, 기본 3,
+  `VITE_ADMIN_LEVEL`)만 회원 추가 / 검색 / 다른 회원 수정. 화면 숨김일 뿐이고 실제 검사는 백엔드가 한다.
+- 이 저장소는 `buildtool-model init` 작업 공간 모드가 프런트엔드 템플릿으로 복사해 쓴다.
 - 코드 스타일: Prettier (세미콜론 없음, 작은따옴표, 80자). 주석은 한국어.
 - 새 테이블 화면을 만들 때는 게시판 페이지(`src/pages/Board*.tsx`)를 따라 만든다.

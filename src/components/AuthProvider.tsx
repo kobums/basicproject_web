@@ -3,7 +3,6 @@ import type { ReactNode } from 'react'
 import { AuthContext } from '../context/auth'
 import type { User } from '../gen/types/user'
 import { fetchMe } from '../api/auth'
-import { ApiError } from '../gen/models/contract'
 import { getToken, setToken, UNAUTHORIZED_EVENT } from '../lib/authStorage'
 
 interface AuthProviderProps {
@@ -30,10 +29,9 @@ export function AuthProvider({ children }: Readonly<AuthProviderProps>) {
     if (!getToken()) return
     fetchMe()
       .then(setUser)
-      .catch((e: unknown) => {
+      .catch(() => {
         // HTTP 401 이면 api/setup.ts 의 핸들러가 이미 토큰을 비우고 이벤트를 쏜다.
-        // Go 식 HTTP 200 + {code: "auth error"} 도 토큰이 무효라는 뜻이므로 같이 비운다.
-        if (e instanceof ApiError && e.code === 'auth error') setToken(null)
+        // 그 밖의 실패(네트워크 등)는 토큰을 두고 비로그인으로만 본다 (새로고침하면 다시 시도).
         setUser(null)
       })
       .finally(() => setRestoring(false))

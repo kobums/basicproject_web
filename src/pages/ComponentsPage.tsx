@@ -218,7 +218,8 @@ export function ComponentsPage() {
   })
 
   const fetchPickerUsers = useCallback(
-    // 이름이 같은 회원 (gomachine 문자열 필터는 같음(=) 비교, '@' 가 있으면 이메일로 찾는다)
+    // 이름에 검색어가 들어간 회원 (gomachine 문자열 필터는 부분 일치, '@' 가 있으면 이메일로 찾는다).
+    // 관리자가 아니면 서버가 본인 행만 돌려준다.
     (page: number, keyword: string) =>
       UserModel.findpage({
         page,
@@ -483,7 +484,7 @@ export function ComponentsPage() {
             setPickedUser(u)
             notify({ type: 'success', message: `${u.name || u.email} 선택됨` })
           }}
-          placeholder="이름 또는 이메일 (정확히 일치)"
+          placeholder="이름 또는 이메일 (일부만 입력해도 찾는다)"
         />
       </div>
 

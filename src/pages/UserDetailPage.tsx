@@ -7,12 +7,15 @@ import { formatDateTime } from '../lib/format'
 import { ConfirmModal } from '../components/ConfirmModal'
 import { DescriptionList } from '../components/DescriptionList'
 import { useFeedback } from '../context/feedback'
+import { useAuth } from '../context/auth'
+import { canManageUser, isAdmin } from '../lib/permissions'
 
 export function UserDetailPage() {
   const { id } = useParams<{ id: string }>()
   const userId = Number(id)
   const navigate = useNavigate()
   const notify = useFeedback()
+  const { user: me } = useAuth()
   const { item: user, loading, error, fetchOne } = useUser()
   const [loadedId, setLoadedId] = useState<number | null>(null)
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -34,7 +37,8 @@ export function UserDetailPage() {
       await UserModel.remove(userId)
       setConfirmOpen(false)
       notify({ type: 'success', message: '회원이 삭제되었습니다.' })
-      navigate('/users')
+      // 본인 탈퇴면 로그인 상태도 끝난다 (다음 요청이 401).
+      navigate(me?.id === userId ? '/login' : '/users')
     } catch (e) {
       setDeleting(false)
       setConfirmOpen(false)
@@ -55,6 +59,9 @@ export function UserDetailPage() {
     )
   if (!user) return <p className="muted page">회원이 없습니다.</p>
 
+  // 수정 / 삭제는 본인 또는 관리자만 (서버도 같은 규칙으로 막는다).
+  const manage = canManageUser(me, user)
+
   return (
     <section className="page user-detail">
       <h1>{user.name || `#${user.id}`}</h1>
@@ -69,19 +76,23 @@ export function UserDetailPage() {
 
       <div className="board-form-actions">
         <Link className="btn" to="/users">
-          목록
+          {isAdmin(me) ? '목록' : '내 정보'}
         </Link>
-        <Link className="btn" to={`/users/${user.id}/edit`}>
-          수정
-        </Link>
-        <button
-          type="button"
-          className="btn btn-danger"
-          onClick={() => setConfirmOpen(true)}
-          disabled={deleting}
-        >
-          삭제
-        </button>
+        {manage && (
+          <>
+            <Link className="btn" to={`/users/${user.id}/edit`}>
+              수정
+            </Link>
+            <button
+              type="button"
+              className="btn btn-danger"
+              onClick={() => setConfirmOpen(true)}
+              disabled={deleting}
+            >
+              삭제
+            </button>
+          </>
+        )}
       </div>
 
       <ConfirmModal

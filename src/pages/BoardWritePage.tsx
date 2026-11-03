@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { BoardForm } from '../components/BoardForm'
 import type { BoardFormValues } from '../components/BoardForm'
 import BoardModel from '../gen/models/board'
+import type { CreateBoardRequest } from '../gen/types/board'
 import { uploadImage } from '../api/upload'
 import { errorMessage, fieldErrorsOf } from '../api/errors'
 import { useFeedback } from '../context/feedback'
@@ -23,13 +24,13 @@ export function BoardWritePage() {
     setFieldErrors({})
     try {
       // 이미지는 먼저 올리고 받은 경로를 img 에 넣는다.
-      // 작성자(user)는 보내지 않는다: 서버가 로그인 사용자(session)로 채운다.
-      const img = values.image ? await uploadImage(values.image) : null
-      const created = await BoardModel.insert({
+      // 작성자(user) / 작성일(createddate)은 서버가 채우므로 CreateBoardRequest 에 없다.
+      const body: CreateBoardRequest = {
         title: values.title,
         content: values.content,
-        img,
-      })
+        img: values.image ? await uploadImage(values.image) : null,
+      }
+      const created = await BoardModel.insert(body)
       notify({ type: 'success', message: '게시글이 등록되었습니다.' })
       // Go / Rust 는 {id}, Spring 은 저장한 엔티티를 돌려준다 (둘 다 id 가 있다).
       navigate(created.id ? `/boards/${created.id}` : '/')

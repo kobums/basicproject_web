@@ -16,8 +16,9 @@ export interface User {
   createddate: string
 }
 
-// Create request type (기본 키는 보통 서버가 정하므로 선택이다)
-export type CreateUserRequest = Omit<User, 'id'> & Partial<Pick<User, 'id'>>
+// Create request type (기본 키는 보통 서버가 정하므로 선택이다).
+// 서버가 정하는 필드(세션 컬럼, 보호 컬럼, createddate)는 없다.
+export type CreateUserRequest = Omit<User, 'id' | 'level' | 'createddate'> & Partial<Pick<User, 'id'>>
 
 // Update request type (보낸 필드만 바꾼다)
 export type UpdateUserRequest = Partial<Omit<User, 'id'>>

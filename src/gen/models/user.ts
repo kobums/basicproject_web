@@ -44,7 +44,6 @@ export default class UserModel {
     toDone(res.data)
   }
 
-
   static async find(params?: UserSearchParams): Promise<User[]> {
     const res = await get<unknown>('/user', { params })
     return toList<User>(res.data)
@@ -77,7 +76,6 @@ export default class UserModel {
     const res = await get<unknown>('/user/count', { params })
     return toCount(res.data)
   }
-
 
   // 없으면 null (Go {item: null}, Spring 404 는 api 래퍼가 던진다).
   static async get(id: Id): Promise<User | null> {

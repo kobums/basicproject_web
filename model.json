@@ -21,7 +21,8 @@
     {
       "name": "board",
       "join": [{ "name": "user", "column": "user" }],
-      "session": [{ "key": "id", "column": "user" }]
+      "session": [{ "key": "id", "column": "user" }],
+      "read": "login"
     }
   ]
 }

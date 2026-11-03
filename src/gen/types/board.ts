@@ -20,8 +20,9 @@ export interface Board {
   }
 }
 
-// Create request type (기본 키는 보통 서버가 정하므로 선택이다)
-export type CreateBoardRequest = Omit<Board, 'id'> & Partial<Pick<Board, 'id'>>
+// Create request type (기본 키는 보통 서버가 정하므로 선택이다).
+// 서버가 정하는 필드(세션 컬럼, 보호 컬럼, createddate)는 없다.
+export type CreateBoardRequest = Omit<Board, 'id' | 'user' | 'createddate'> & Partial<Pick<Board, 'id'>>
 
 // Update request type (보낸 필드만 바꾼다)
 export type UpdateBoardRequest = Partial<Omit<Board, 'id'>>

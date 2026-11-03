@@ -2,8 +2,7 @@ import { useState } from 'react'
 import type { SyntheticEvent } from 'react'
 
 // 검색 조건 = 생성 API 의 목록 필터 이름 (BoardSearchParams 의 title / content).
-// gomachine 문자열 필터는 기본이 같음(=) 비교라 검색어와 정확히 같은 글을 찾는다.
-// 부분 검색이 필요하면 백엔드에 검색 API 를 따로 만들거나 Go 의 compare(like) 설정을 쓴다 (README 참고).
+// gomachine 문자열 필터는 모든 백엔드(Go / Spring / Rust)에서 부분 일치(like '%검색어%')다.
 export type SearchType = 'title' | 'content'
 
 export interface BoardSearch {
@@ -63,7 +62,7 @@ export function SearchBar({ value, onSearch }: Readonly<SearchBarProps>) {
           type="search"
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
-          placeholder="검색어를 입력하세요"
+          placeholder="검색어 (일부만 입력해도 찾는다)"
           aria-label="검색어"
         />
 

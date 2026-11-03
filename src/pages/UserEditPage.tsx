@@ -7,12 +7,15 @@ import UserModel from '../gen/models/user'
 import type { UpdateUserRequest } from '../gen/types/user'
 import { errorMessage, fieldErrorsOf } from '../api/errors'
 import { useFeedback } from '../context/feedback'
+import { useAuth } from '../context/auth'
+import { canManageUser } from '../lib/permissions'
 
 export function UserEditPage() {
   const { id } = useParams<{ id: string }>()
   const userId = Number(id)
   const navigate = useNavigate()
   const notify = useFeedback()
+  const { user: me } = useAuth()
   const { item: user, loading, error, fetchOne } = useUser()
   const [loadedId, setLoadedId] = useState<number | null>(null)
 
@@ -34,6 +37,7 @@ export function UserEditPage() {
     setFieldErrors({})
     try {
       // 이메일은 바꾸지 않는다. 비밀번호(passwd)는 입력했을 때만 보낸다 (안 보낸 필드는 서버가 유지).
+      // level / createddate 는 서버가 지키는 값이라 보내지 않는다.
       const body: UpdateUserRequest = { name: values.name }
       if (values.password) body.passwd = values.password
       await UserModel.update(userId, body)
@@ -58,6 +62,8 @@ export function UserEditPage() {
       </p>
     )
   if (!user) return <p className="muted page">회원이 없습니다.</p>
+  if (!canManageUser(me, user))
+    return <p className="error page">본인 또는 관리자만 수정할 수 있습니다.</p>
 
   return (
     <section className="page">

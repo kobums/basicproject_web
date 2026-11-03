@@ -9,6 +9,8 @@ import { ListToolbar } from '../components/ListToolbar'
 import { DataTable } from '../components/DataTable'
 import type { DataTableColumn } from '../components/DataTable'
 import { formatDateTime, pageCount } from '../lib/format'
+import { useAuth } from '../context/auth'
+import { isAdmin } from '../lib/permissions'
 
 const COLUMNS: DataTableColumn<User>[] = [
   { key: 'id', header: '번호', width: '64px', align: 'center' },
@@ -29,13 +31,16 @@ const COLUMNS: DataTableColumn<User>[] = [
   },
 ]
 
-// 검색어 → 목록 필터. gomachine 문자열 필터는 같음(=) 비교라 '@' 가 있으면 이메일, 아니면 이름과 정확히 같은 회원을 찾는다.
+// 검색어 → 목록 필터. gomachine 문자열 필터는 부분 일치라 '@' 가 있으면 이메일, 아니면 이름에 검색어가 들어간 회원을 찾는다.
 function toFilter(keyword: string): UserSearchParams {
   if (!keyword) return {}
   return keyword.includes('@') ? { email: keyword } : { name: keyword }
 }
 
 export function UserListPage() {
+  // 회원 읽기는 본인 행만 (관리자는 모든 회원). 관리자가 아니면 목록에 자기 자신만 온다.
+  const { user: me } = useAuth()
+  const admin = isAdmin(me)
   const { items, total, loading, error, fetchPage } = useUser()
   const [page, setPage] = useState(1)
   const [size, setSize] = useState(10)
@@ -72,22 +77,28 @@ export function UserListPage() {
 
   return (
     <section className="page">
-      <PageHeader title="회원">
-        <Link className="btn btn-primary" to="/users/new">
-          회원 추가
-        </Link>
+      <PageHeader title={admin ? '회원' : '내 정보'}>
+        {admin && (
+          <Link className="btn btn-primary" to="/users/new">
+            회원 추가
+          </Link>
+        )}
       </PageHeader>
 
-      <search className="search-bar">
-        <input
-          className="search-input"
-          type="search"
-          value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
-          placeholder="이름 또는 이메일 (정확히 일치)"
-          aria-label="회원 검색"
-        />
-      </search>
+      {admin ? (
+        <search className="search-bar">
+          <input
+            className="search-input"
+            type="search"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            placeholder="이름 또는 이메일 (일부만 입력해도 찾는다)"
+            aria-label="회원 검색"
+          />
+        </search>
+      ) : (
+        <p className="muted">관리자가 아니면 본인 정보만 볼 수 있습니다.</p>
+      )}
 
       {loading && !loaded && <p className="muted">불러오는 중…</p>}
       {error != null && (

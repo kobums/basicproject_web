@@ -6,7 +6,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig(({ mode }) => {
   // .env / .env.local / 셸 환경변수에서 읽는다 (vite.config 에서만 쓰므로 번들에 들어가지 않는다).
   const env = { ...loadEnv(mode, process.cwd(), 'VITE_'), ...process.env }
-  // 백엔드 주소: Go 8007 (기본) / Spring 8081 / Rust 8080
+  // 백엔드 주소: Go 8007 (기본) / Spring 8081 / Rust 8008
   const target = env.VITE_PROXY_TARGET || 'http://localhost:8007'
 
   return {

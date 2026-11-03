@@ -12,6 +12,7 @@ import { SignupPage } from './pages/SignupPage'
 import { ComponentsPage } from './pages/ComponentsPage'
 import { RequireAuth } from './components/RequireAuth'
 import { useAuth } from './context/auth'
+import { isAdmin } from './lib/permissions'
 
 function App() {
   const { user, isAuthenticated, logout } = useAuth()
@@ -30,7 +31,7 @@ function App() {
           <NavLink to="/" end>
             게시판
           </NavLink>
-          <NavLink to="/users">회원</NavLink>
+          <NavLink to="/users">{isAdmin(user) ? '회원' : '내 정보'}</NavLink>
           <NavLink to="/components">컴포넌트</NavLink>
         </div>
         <div className="topnav-auth">
@@ -55,7 +56,7 @@ function App() {
       </nav>
 
       <main className="container">
-        {/* auth=jwt 로 생성한 API 는 읽기도 로그인이 필요하므로 게시판 / 회원 화면은 모두 RequireAuth 로 감싼다. */}
+        {/* auth=jwt: 게시판은 read "login", 회원은 본인(관리자는 전체)만 읽으므로 게시판 / 회원 화면은 모두 RequireAuth 로 감싼다. */}
         <Routes>
           <Route
             path="/"

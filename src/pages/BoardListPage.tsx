@@ -68,6 +68,7 @@ const COLUMNS: DataTableColumn<Board>[] = [
 
 export function BoardListPage() {
   // 목록 상태는 생성 훅(useBoard)이 갖고, 페이지(1 부터) / 크기 / 검색 조건만 여기서 관리한다.
+  // board 는 read: "login" 이라 로그인 사용자는 모든 사람의 글을 본다 (수정 / 삭제는 상세 화면에서 작성자만).
   const { items, total, loading, error, fetchPage } = useBoard()
   const [page, setPage] = useState(1)
   const [size, setSize] = useState(10)

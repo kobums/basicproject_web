@@ -13,8 +13,10 @@ export interface SignupRequest {
   password: string
 }
 
-// login / signup 을 정리한 결과 (응답 모양은 api/auth.ts 참고)
+// login / signup 응답 {token, tokenType: "Bearer", expiresInMs, user} 을 정리한 결과
 export interface AuthResult {
   token: string
+  // 토큰 유효 시간 (밀리초). 백엔드 JWT_EXPIRATION_MS, 기본 24시간
+  expiresInMs?: number
   user: User
 }

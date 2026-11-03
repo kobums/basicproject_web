@@ -1,7 +1,9 @@
 # basicproject_web
 
 React + TypeScript + Vite 프론트엔드 템플릿. gomachine 이 만든 백엔드(Go `basicproject_go`, Spring `basicproject_springboot`, Rust `basicproject_rust`)에 붙는다.
-세 백엔드는 같은 HTTP 계약(gomachine README 의 "HTTP 계약")을 따르므로 이 프론트엔드는 어느 쪽에도 그대로 쓴다.
+세 백엔드는 같은 HTTP 계약(gomachine README 의 "HTTP 계약", "인증 API 계약")을 따르므로 이 프론트엔드는 어느 쪽에도 그대로 쓴다.
+
+이 저장소는 `buildtool-model init` 의 작업 공간 모드가 프런트엔드 템플릿으로 쓴다 (작업 공간 루트에 `model.json`, DB, 백엔드와 함께 만든다).
 
 - 게시판 / 회원 화면은 gomachine 이 생성한 모델, 타입, 훅(`src/gen`)을 쓴다.
 - 인증(로그인 / 회원가입 / 내 정보), UI 컴포넌트, 페이지는 손으로 만든 부분이다.
@@ -31,7 +33,7 @@ npm run dev          # 백엔드가 떠 있어야 한다 (기본 http://localhos
 |---|---|---|
 | Go (`basicproject_go`) | 8007 | `http://localhost:8007` (기본값) |
 | Spring Boot (`basicproject_springboot`) | 8081 | `http://localhost:8081` |
-| Rust (`basicproject_rust`) | 8080 (`PORT` 환경변수 기본값) | `http://localhost:8080` |
+| Rust (`basicproject_rust`) | 8008 (`PORT` 환경변수 기본값) | `http://localhost:8008` |
 
 백엔드를 바꿀 때는 `.env` (또는 `.env.local`) 의 `VITE_PROXY_TARGET` 만 바꾸고 `npm run dev` 를 다시 띄운다.
 
@@ -42,6 +44,7 @@ npm run dev          # 백엔드가 떠 있어야 한다 (기본 http://localhos
 | `VITE_API_BASE_URL` | `/api` | 브라우저 | API 주소 앞부분. 백엔드를 직접 가리키면 `http://localhost:8007/api` (백엔드 CORS 필요) |
 | `VITE_UPLOAD_BASE_URL` | `/uploads` | 브라우저 | 게시글 이미지(`img`) 주소 앞부분 |
 | `VITE_PROXY_TARGET` | `http://localhost:8007` | `vite.config.ts` | dev 서버 프록시 대상 (번들에 들어가지 않는다) |
+| `VITE_ADMIN_LEVEL` | `3` | 브라우저 | 관리자 레벨. `model.json` 의 `adminLevel` 과 같게 둔다 (관리자 메뉴 표시에만 쓴다) |
 
 - `.env` 는 `.env.example` 을 복사해서 만들고 커밋하지 않는다. 개인 설정은 `.env.local` (`.env.local.example` 참고).
 - ⚠️ 브라우저에서 읽는 `VITE_*` 값은 빌드 결과에 그대로 들어간다. **시크릿/비밀키를 넣지 말 것.**
@@ -73,7 +76,7 @@ src/gen/
 
 ### 생성 설정 (`model.json`)
 
-이 저장소의 `model.json` 은 프론트엔드에 필요한 부분을 적은 **예시**다. 실제 `model.json` 은 `gomachine init` 이 만드는 작업 공간 루트에 있고,
+이 저장소의 `model.json` 은 프론트엔드에 필요한 부분을 적은 **예시**다. 실제 `model.json` 은 `buildtool-model init` 이 만드는 작업 공간 루트에 있고,
 그 파일에 아래 값을 넣는다.
 
 | 키 | 값 | 이유 |
@@ -83,8 +86,10 @@ src/gen/
 | `tsOutDir` | `"src/gen"` | 생성 파일을 손으로 만든 `src/hooks`, `src/types` 와 섞지 않는다 (기본 `"src"`) |
 | `tsSemicolons` | `false` | 이 프로젝트의 Prettier `semi: false` 와 맞춘다 |
 | `table[board].join` | `[{"name": "user", "column": "user"}]` | 게시글 응답에 작성자를 `extra.user` 로 넣는다 (목록 / 상세의 작성자 이름) |
-| `table[board].session` | `[{"key": "id", "column": "user"}]` | 작성자 = 로그인 사용자 (서버가 채운다) |
+| `table[board].session` | `[{"key": "id", "column": "user"}]` | 작성자 = 로그인 사용자 (서버가 채운다). 수정 / 삭제는 작성자만 |
+| `table[board].read` | `"login"` | 로그인 사용자는 모든 글을 읽는다 (없으면 `session` 때문에 `"owner"` = 자기 글만) |
 | `table[user].protect` | `["level"]` | 회원 레벨은 클라이언트가 바꿀 수 없다 |
+| `adminLevel` | `"3"` | `level` 이 이 값 이상이면 관리자 (모든 회원 읽기 / 수정). 프런트의 `VITE_ADMIN_LEVEL` 과 같게 |
 
 ### 다시 생성하기
 
@@ -101,12 +106,13 @@ buildtool-model <작업 공간 루트>   # model.json 이 있는 디렉터리 (D
 
 - **읽기는 훅**: `const { items, total, loading, error, fetchPage } = useBoard()` → `fetchPage({ page, pagesize, orderby: 'id desc', title })`.
   `page` 는 **1 부터**이고 `total` 은 전체 행 수다. `Pagination` 컴포넌트도 1 부터 받는다 (`pageCount(total, pagesize)` 로 전체 페이지 계산).
-- **쓰기는 모델**: `await BoardModel.insert({...})`, `BoardModel.update(id, {...})`, `BoardModel.remove(id)` 는 실패하면 던지므로 `try/catch` 로 알림을 띄운다.
-  (훅의 `create/update/remove` 는 에러를 `error` 상태에 담고 `undefined` 를 돌려준다.)
+- **쓰기는 모델**: `await BoardModel.insert(body)`, `BoardModel.update(id, body)`, `BoardModel.remove(id)` 는 실패하면 던지므로 `try/catch` 로 알림을 띄운다.
+  본문 타입은 `CreateBoardRequest` / `UpdateBoardRequest` 다. `Create*Request` 에는 서버가 정하는 필드(작성자 `user`, 회원 `level`, `createddate`)가 없다.
+  훅의 `create/update/remove` 도 실패하면 `error` 에 담고 다시 던지지만, `loading` 을 바꿔 폼이 다시 그려지므로 이 화면들은 모델을 직접 부른다.
+- **늦은 응답**: 훅의 `fetchPage` / `fetchAll` / `fetchOne` 은 마지막 요청의 결과만 반영한다 (검색어를 빨리 바꿔도 이전 응답이 덮어쓰지 않는다).
 - **조인**: 게시글 작성자 이름은 `board.extra?.user?.name`, 작성자 id 는 `board.user`.
-- **목록 필터**: 이름은 JSON key 와 같다 (`title`, `content`, `user`, `startcreateddate` ...). gomachine 문자열 필터는 기본이 **같음(=)** 비교다.
-  그래서 게시판 / 회원 검색은 검색어와 정확히 같은 값을 찾는다. 부분 검색이 필요하면 백엔드에 검색 API 를 따로 만든다
-  (Go 는 `compare` 로 like 를 켤 수 있지만 Spring 은 항상 = 라서 백엔드마다 결과가 달라진다).
+- **목록 필터**: 이름은 JSON key 와 같다 (`title`, `content`, `user`, `startcreateddate` ...). 문자열 필터는 모든 백엔드에서 **부분 일치**
+  (`like '%검색어%'`, `%` `_` 는 글자 그대로)다. 그래서 게시판 / 회원 검색은 검색어가 들어간 값을 찾는다 (정확히 같은 값은 `/search/{field}`).
 - **에러 문구**: `errorMessage(e, '기본 문구')` (`src/api/errors.ts`) 가 `HttpError`(HTTP 상태 코드 에러, Spring)와
   `ApiError`(HTTP 200 + `code: "error" | "auth error"`, Go / Rust)를 함께 처리한다. 입력값 오류는 `fieldErrorsOf(e)`.
 
@@ -125,28 +131,35 @@ HTTP 클라이언트는 `src/api/client.ts` 하나다. 생성 모델(`src/gen/se
 2. 새로고침 → 저장된 토큰이 있으면 `GET /api/auth/me` 로 사용자를 복구한다. 그동안 `RequireAuth` 는 판단을 미룬다.
 3. 토큰이 무효(HTTP 401, 또는 `/auth/me` 의 Go 식 `{code: "auth error"}`)면 토큰을 지우고 로그인 화면으로 보낸다.
 4. `auth: "jwt"` 로 생성한 API 는 읽기에도 로그인이 필요하므로 게시판 / 회원 화면은 모두 `RequireAuth` 로 감싼다.
-   board 의 `session` 설정 때문에 게시판 목록은 **로그인한 사용자의 글**만 보인다 (gomachine 의 소유권 규칙).
+
+### 권한과 화면
+
+gomachine 의 읽기 정책을 따른다. 버튼 숨김은 `src/lib/permissions.ts` 한 곳에서 판단하고, 실제 검사는 백엔드가 한다.
+
+- 게시판 (`read: "login"`): 로그인 사용자는 **모든 글**을 목록 / 상세에서 본다. 수정 / 삭제 버튼은 작성자(`board.user === 로그인 id`)에게만 보이고,
+  남의 글 수정 화면은 막는다 (서버도 Go / Rust `auth error`, Spring 404 로 거부).
+- 회원: 일반 사용자는 **본인 행만** 읽는다 (목록에 자기 자신만, 메뉴 이름 "내 정보"). 관리자(`level >= ADMIN_LEVEL`, 기본 3, `VITE_ADMIN_LEVEL`)는
+  모든 회원을 보고 회원 추가 / 검색 / 다른 회원 수정 · 삭제 UI 가 보인다. 일반 가입은 `/signup` (`POST /api/auth/signup`).
 
 ### 백엔드 인증 API 계약
 
 | 요청 | 본문 | 응답 |
 |---|---|---|
-| `POST /api/auth/login` | `{ "email", "password" }` | `{ "token": "...", "user": User }` |
-| `POST /api/auth/signup` | `{ "email", "name", "password" }` | `{ "token": "...", "user": User }` (201 도 된다) |
-| `GET /api/auth/me` (Bearer) | - | `User` |
+| `POST /api/auth/login` | `{ "email", "password" }` | 200 `{ "token", "tokenType": "Bearer", "expiresInMs", "user": User }` / 401 |
+| `POST /api/auth/signup` | `{ "email", "name", "password" }` | 201 `{ "token", "tokenType": "Bearer", "expiresInMs", "user": User }` / 400 / 409 |
+| `GET /api/auth/me` (Bearer) | - | 200 `User` / 401 |
+| `POST /api/upload/index` (Bearer) | multipart, 파일 필드 `upload` | 200 `{ "filename", "url" }` / 400 / 401 |
 
 - `User` = `GET /api/user/:id` 와 같은 JSON: `{ "id", "email", "name", "level", "createddate" }` (비밀번호 없음).
-- 너그럽게 받는 모양 (`src/api/auth.ts`): 토큰 이름 `token` / `accessToken` / `access_token`, Go 식 봉투 `{ "code": "ok", ... }`,
-  한 겹 감싼 `{ "item": {...} }` / `{ "data": {...} }`, `/auth/me` 의 `{ "user": User }`. 예전 이름 `createdAt` 도 받는다.
-  login / signup 응답에 `user` 가 없으면 받은 토큰으로 `/auth/me` 를 한 번 더 부른다.
-- 에러: 잘못된 비밀번호 등은 HTTP 400/401 + `{ "message" }` (입력값 오류는 `{ "fieldErrors": { "email": "..." } }`),
-  또는 HTTP 200 + `{ "code": "error", "error": "메시지" }`.
+- 세 백엔드(Go / Spring / Rust 템플릿)가 같은 모양을 보낸다. `src/api/auth.ts` 는 이 모양만 읽는다 (토큰이나 user 가 없으면 `ApiError`).
+- 에러: HTTP 상태 + `{ "status", "message", "fieldErrors"? }` → `HttpError`. 화면은 `errorMessage(e)`, 입력값 오류는 `fieldErrorsOf(e)`
+  (`{ "email": "..." }`). 생성된 테이블 API 의 Go / Rust HTTP 200 + `code` 에러와 다르다.
 
 ### 이미지 업로드
 
 게시글은 JSON 으로 저장한다. 이미지는 먼저 `POST /api/upload/index` (multipart 필드 `upload`, 로그인 필요)로 올리고
-응답의 `filename` 을 `img` 에 넣는다 (`src/api/upload.ts`). 화면에는 `VITE_UPLOAD_BASE_URL/{img}` 로 보여준다.
-이 업로드 경로는 `basicproject_go` 기준이다. 다른 백엔드는 같은 경로를 만들거나 `upload.ts` 를 고친다.
+응답 `{ filename, url }` 의 `url` 을 (없으면 `filename` 을) `img` 에 넣는다 (`src/api/upload.ts`).
+화면에서는 `/` 나 `http(s)://` 로 시작하는 값(url)은 그대로, 아니면 `VITE_UPLOAD_BASE_URL/{img}` 로 보여준다 (`imageUrl`).
 
 ## 라우트
 
@@ -169,7 +182,7 @@ src/
 ├── gen/         # gomachine 생성 코드 (models, types, hooks) + services/api.ts (client 재수출)
 ├── components/  # 공용 UI (Modal, Pagination, DataTable, 폼, Provider 등)
 ├── context/     # React Context (auth, feedback, loading)
-├── lib/         # authStorage (토큰 보관), format (날짜, 이미지 주소, 페이지 수)
+├── lib/         # authStorage (토큰 보관), format (날짜, 이미지 주소, 페이지 수), permissions (작성자 / 관리자 판단)
 ├── pages/       # 라우트별 페이지
 ├── types/       # 손으로 만든 타입 (auth)
 ├── test/        # 테스트 도우미 (fetch 흉내, 전역 준비)
@@ -182,9 +195,11 @@ src/
 `npm test` (Vitest). 백엔드 없이 `fetch` 를 흉내 낸다.
 
 - `src/api/client.test.ts`: 토큰 헤더, 401 → 토큰 삭제 + 이벤트, 에러 본문(Spring / Go / 텍스트)
-- `src/api/auth.test.ts`: 인증 응답 모양(`token` / `accessToken` / Go 봉투 / 사용자 없음 → `/auth/me`)
+- `src/api/auth.test.ts`: 인증 계약 (`{token, tokenType, expiresInMs, user}`, `me` → user, 400 `fieldErrors` / 401 에러)
+- `src/api/upload.test.ts`: 업로드 응답 `{filename, url}` → `url` 우선, 없으면 `filename`
+- `src/lib/permissions.test.ts`: 작성자 / 관리자 / 본인 판단
 - `src/gen.contract.test.ts`: 생성 모델이 Go 와 Spring 응답을 같은 결과로 바꾸는지 (목록, 단건, 개수, 쓰기, Go `code` 에러)
-- `src/App.smoke.test.tsx`: happy-dom 에서 로그인 복구 → 게시판 목록 / 상세가 그려지는지
+- `src/App.smoke.test.tsx`: happy-dom 에서 로그인 복구 → 게시판 목록(모든 글) / 상세(작성자만 수정 · 삭제), 회원 화면(일반 = 본인만, 관리자 UI)
 
 ## 라이선스
 

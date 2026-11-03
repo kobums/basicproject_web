@@ -6,6 +6,8 @@ interface ImportMetaEnv {
   readonly VITE_API_BASE_URL?: string
   /** 업로드 이미지 주소 앞부분. 기본 '/uploads' */
   readonly VITE_UPLOAD_BASE_URL?: string
+  /** 관리자 레벨 (model.json 의 adminLevel 과 같게). 기본 3 */
+  readonly VITE_ADMIN_LEVEL?: string
 }
 
 interface ImportMeta {

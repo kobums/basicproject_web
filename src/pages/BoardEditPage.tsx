@@ -9,12 +9,15 @@ import { uploadImage } from '../api/upload'
 import { errorMessage, fieldErrorsOf } from '../api/errors'
 import { imageUrl } from '../lib/format'
 import { useFeedback } from '../context/feedback'
+import { useAuth } from '../context/auth'
+import { isBoardOwner } from '../lib/permissions'
 
 export function BoardEditPage() {
   const { id } = useParams<{ id: string }>()
   const boardId = Number(id)
   const navigate = useNavigate()
   const notify = useFeedback()
+  const { user } = useAuth()
   const { item: board, loading, error, fetchOne } = useBoard()
   const [loadedId, setLoadedId] = useState<number | null>(null)
 
@@ -71,6 +74,9 @@ export function BoardEditPage() {
       </p>
     )
   if (!board) return <p className="muted page">게시글이 없습니다.</p>
+  // 남의 글은 읽을 수만 있다 (서버도 수정을 막는다).
+  if (!isBoardOwner(user, board))
+    return <p className="error page">작성자만 수정할 수 있습니다.</p>
 
   return (
     <section className="page">

@@ -17,7 +17,7 @@ const UPLOAD_BASE = (
   import.meta.env.VITE_UPLOAD_BASE_URL || '/uploads'
 ).replace(/\/$/, '')
 
-// 게시글 img 값(업로드 응답의 filename) → 화면에 쓸 주소. 이미 절대 주소나 / 로 시작하면 그대로 쓴다.
+// 게시글 img 값(업로드 응답의 url, 없으면 filename) → 화면에 쓸 주소. 이미 절대 주소나 / 로 시작하면(url) 그대로 쓴다.
 export function imageUrl(img: string | null | undefined): string | null {
   if (!img) return null
   if (
